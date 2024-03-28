@@ -19,6 +19,7 @@
 //       PB1 -|15      18|- PA8  (LED+1k)
 //       VSS -|16      17|- VDD
 //             ----------
+//Changes
 
 volatile int x;
 
