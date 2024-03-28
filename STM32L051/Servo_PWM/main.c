@@ -27,9 +27,9 @@ void delayms(int len)
 // Interrupt service routines are the same as normal
 // subroutines (or C funtions) in Cortex-M microcontrollers.
 // The following should happen at a rate of 1kHz.
-// The following function is associated with the TIM2 interrupt 
+// The following function is associated with the TIM2 interrupt
 // via the interrupt vector table defined in startup.c
-void TIM2_Handler(void) 
+void TIM2_Handler(void)
 {
 	TIM2->SR &= ~BIT0; // clear update interrupt flag
 	PWM_Counter++;
