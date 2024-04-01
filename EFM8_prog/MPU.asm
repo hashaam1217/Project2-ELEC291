@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-; This file was generated Mon Apr 01 00:00:17 2024
+; This file was generated Mon Apr 01 11:34:19 2024
 ;--------------------------------------------------------
 $name MPU
 $optc51 --model-small
@@ -25,6 +25,8 @@ $optc51 --model-small
 ;--------------------------------------------------------
 	public _I2C_Write_PARM_2
 	public _main
+	public _Test_I2C
+	public _MPU6050_Init
 	public _I2C_Read
 	public _I2C_Write
 	public _I2C_Init
@@ -490,7 +492,6 @@ _overflow_count:
 	rseg	R_OSEG
 _I2C_Write_PARM_2:
 	ds 1
-	rseg	R_OSEG
 ;--------------------------------------------------------
 ; indirectly addressable internal ram data
 ;--------------------------------------------------------
@@ -742,22 +743,22 @@ _I2C_Write:
 	mov	r2,dpl
 ;	MPU.c:155: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 	orl	_SMB0CN0,#0x20
-;	MPU.c:158: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+;	MPU.c:158: while (!(SMB0CN0 & 0x02));
 L007001?:
 	mov	a,_SMB0CN0
-	jnb	acc.0,L007001?
+	jnb	acc.1,L007001?
 ;	MPU.c:161: SMB0DAT = addr;
 	mov	_SMB0DAT,r2
-;	MPU.c:164: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+;	MPU.c:164: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
 L007004?:
 	mov	a,_SMB0CN0
-	jnb	acc.0,L007004?
+	jnb	acc.1,L007004?
 ;	MPU.c:167: SMB0DAT = data_input;
 	mov	_SMB0DAT,_I2C_Write_PARM_2
-;	MPU.c:170: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+;	MPU.c:170: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
 L007007?:
 	mov	a,_SMB0CN0
-	jnb	acc.0,L007007?
+	jnb	acc.1,L007007?
 ;	MPU.c:173: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
 	orl	_SMB0CN0,#0x10
 	ret
@@ -775,41 +776,8 @@ _I2C_Read:
 	mov	r2,dpl
 ;	MPU.c:181: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 	orl	_SMB0CN0,#0x20
-;	MPU.c:184: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
-L008001?:
-	mov	a,_SMB0CN0
-	jnb	acc.0,L008001?
-;	MPU.c:187: SMB0DAT = (addr << 1) | 1;
-	mov	a,r2
-	add	a,r2
-	mov	r2,a
-	mov	a,#0x01
-	orl	a,r2
-	mov	_SMB0DAT,a
-;	MPU.c:190: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
-L008004?:
-	mov	a,_SMB0CN0
-	jnb	acc.0,L008004?
-;	MPU.c:193: data_output = SMB0DAT;
-	mov	dpl,_SMB0DAT
-;	MPU.c:196: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
-	orl	_SMB0CN0,#0x10
-;	MPU.c:198: return data_output;
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'main'
-;------------------------------------------------------------
-;data_storage              Allocated to registers r2 
-;------------------------------------------------------------
-;	MPU.c:201: void main (void) 
-;	-----------------------------------------
-;	 function main
-;	-----------------------------------------
-_main:
-;	MPU.c:205: waitms(500); // Give PuTTY a chance to start.
-	mov	dptr,#0x01F4
-	lcall	_waitms
-;	MPU.c:206: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+;	MPU.c:183: printf("Transfer started");
+	push	ar2
 	mov	a,#__str_0
 	push	acc
 	mov	a,#(__str_0 >> 8)
@@ -820,26 +788,11 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	MPU.c:211: __FILE__, __DATE__, __TIME__);
-;	MPU.c:210: "Compiled: %s, %s\n\n",
-	mov	a,#__str_4
-	push	acc
-	mov	a,#(__str_4 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#__str_3
-	push	acc
-	mov	a,#(__str_3 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#__str_2
-	push	acc
-	mov	a,#(__str_2 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
+;	MPU.c:184: printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+	mov	r3,_SMB0CN0
+	mov	r4,#0x00
+	push	ar3
+	push	ar4
 	mov	a,#__str_1
 	push	acc
 	mov	a,#(__str_1 >> 8)
@@ -848,21 +801,92 @@ _main:
 	push	acc
 	lcall	_printf
 	mov	a,sp
-	add	a,#0xf4
+	add	a,#0xfb
 	mov	sp,a
-;	MPU.c:213: I2C_Init();
-	lcall	_I2C_Init
-;	MPU.c:214: data_storage = I2C_Read(0x68);
-	mov	dpl,#0x68
+	pop	ar2
+;	MPU.c:186: while (!(SMB0CN0 & 0x02)); 
+L008001?:
+	mov	a,_SMB0CN0
+	jnb	acc.1,L008001?
+;	MPU.c:188: printf("Transfer complete");
+	push	ar2
+	mov	a,#__str_2
+	push	acc
+	mov	a,#(__str_2 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+	pop	ar2
+;	MPU.c:191: SMB0DAT = (addr << 1) | 1;
+	mov	a,r2
+	add	a,r2
+	mov	r2,a
+	mov	a,#0x01
+	orl	a,r2
+	mov	_SMB0DAT,a
+;	MPU.c:194: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+L008004?:
+	mov	a,_SMB0CN0
+	jnb	acc.1,L008004?
+;	MPU.c:197: data_output = SMB0DAT;
+	mov	dpl,_SMB0DAT
+;	MPU.c:200: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+	orl	_SMB0CN0,#0x10
+;	MPU.c:202: return data_output;
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'MPU6050_Init'
+;------------------------------------------------------------
+;------------------------------------------------------------
+;	MPU.c:205: void MPU6050_Init()
+;	-----------------------------------------
+;	 function MPU6050_Init
+;	-----------------------------------------
+_MPU6050_Init:
+;	MPU.c:207: I2C_Write(0x6B, 0x00);
+	mov	_I2C_Write_PARM_2,#0x00
+	mov	dpl,#0x6B
+	ljmp	_I2C_Write
+;------------------------------------------------------------
+;Allocation info for local variables in function 'Test_I2C'
+;------------------------------------------------------------
+;data_in                   Allocated to registers r2 
+;------------------------------------------------------------
+;	MPU.c:210: void Test_I2C()
+;	-----------------------------------------
+;	 function Test_I2C
+;	-----------------------------------------
+_Test_I2C:
+;	MPU.c:212: uint8_t data_in = I2C_Read(0x75);
+	mov	dpl,#0x75
 	lcall	_I2C_Read
 	mov	r2,dpl
-;	MPU.c:215: printf("Data: %u\n", data_storage);
+;	MPU.c:213: if (data_in == 0x68)
+	cjne	r2,#0x68,L010002?
+;	MPU.c:215: printf("I2C is working correctly\n");
+	mov	a,#__str_3
+	push	acc
+	mov	a,#(__str_3 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+	ret
+L010002?:
+;	MPU.c:220: printf("I2C is not working correctly: %u\n", data_in);
 	mov	r3,#0x00
 	push	ar2
 	push	ar3
-	mov	a,#__str_5
+	mov	a,#__str_4
 	push	acc
-	mov	a,#(__str_5 >> 8)
+	mov	a,#(__str_4 >> 8)
 	push	acc
 	mov	a,#0x80
 	push	acc
@@ -871,16 +895,123 @@ _main:
 	add	a,#0xfb
 	mov	sp,a
 	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'main'
+;------------------------------------------------------------
+;------------------------------------------------------------
+;	MPU.c:224: void main (void) 
+;	-----------------------------------------
+;	 function main
+;	-----------------------------------------
+_main:
+;	MPU.c:227: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+	orl	_SMB0CN0,#0x10
+;	MPU.c:229: waitms(500); // Give PuTTY a chance to start.
+	mov	dptr,#0x01F4
+	lcall	_waitms
+;	MPU.c:230: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+	mov	a,#__str_5
+	push	acc
+	mov	a,#(__str_5 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	MPU.c:235: __FILE__, __DATE__, __TIME__);
+;	MPU.c:234: "Compiled: %s, %s\n\n",
+	mov	a,#__str_9
+	push	acc
+	mov	a,#(__str_9 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	mov	a,#__str_8
+	push	acc
+	mov	a,#(__str_8 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	mov	a,#__str_7
+	push	acc
+	mov	a,#(__str_7 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	mov	a,#__str_6
+	push	acc
+	mov	a,#(__str_6 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xf4
+	mov	sp,a
+;	MPU.c:237: I2C_Init();
+	lcall	_I2C_Init
+;	MPU.c:238: MPU6050_Init();
+	lcall	_MPU6050_Init
+;	MPU.c:239: printf("Init Done\n");
+	mov	a,#__str_10
+	push	acc
+	mov	a,#(__str_10 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	MPU.c:241: SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
+	anl	_SMB0CN0,#0xEF
+;	MPU.c:242: printf("%02X\n", SMB0CN0);
+	mov	r2,_SMB0CN0
+	mov	r3,#0x00
+	push	ar2
+	push	ar3
+	mov	a,#__str_11
+	push	acc
+	mov	a,#(__str_11 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
+;	MPU.c:244: Test_I2C();
+	ljmp	_Test_I2C
 	rseg R_CSEG
 
 	rseg R_XINIT
 
 	rseg R_CONST
 __str_0:
+	db 'Transfer started'
+	db 0x00
+__str_1:
+	db 'SMB0CN0: %02X'
+	db 0x0A
+	db 0x00
+__str_2:
+	db 'Transfer complete'
+	db 0x00
+__str_3:
+	db 'I2C is working correctly'
+	db 0x0A
+	db 0x00
+__str_4:
+	db 'I2C is not working correctly: %u'
+	db 0x0A
+	db 0x00
+__str_5:
 	db 0x1B
 	db '[2J'
 	db 0x00
-__str_1:
+__str_6:
 	db 'EFM8 Period measurement at pin P0.1 using Timer 0.'
 	db 0x0A
 	db 'File: %s'
@@ -889,17 +1020,21 @@ __str_1:
 	db 0x0A
 	db 0x0A
 	db 0x00
-__str_2:
+__str_7:
 	db 'MPU.c'
 	db 0x00
-__str_3:
+__str_8:
 	db 'Apr  1 2024'
 	db 0x00
-__str_4:
-	db '00:00:17'
+__str_9:
+	db '11:34:19'
 	db 0x00
-__str_5:
-	db 'Data: %u'
+__str_10:
+	db 'Init Done'
+	db 0x0A
+	db 0x00
+__str_11:
+	db '%02X'
 	db 0x0A
 	db 0x00
 

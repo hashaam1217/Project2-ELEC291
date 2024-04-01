@@ -11,7 +11,7 @@ R_GSINIT,code,0000,NO
 R_BSEG,bit,0000,NO
 R_XSEG,xdata,0000,NO
 BIT_BANK,data,0000,OV
-R_CONST,code,0079,NO
+R_CONST,code,00EE,NO
 rbank0,data,0000,OV
 R_PSEG,xdata,0000,NO
 R_DINIT,code,0000,NO
@@ -21,7 +21,7 @@ R_IXSEG,xdata,0000,NO
 R_ISEG,idata,0000,NO
 R_HOME,code,0000,NO
 R_XINIT,code,0000,NO
-R_CSEG,code,017C,NO
+R_CSEG,code,022B,NO
 </SEGMENTS>
 
 <LOCALS>
@@ -30,29 +30,38 @@ L002001?,R_CSEG,001E,0000
 L003007?,R_CSEG,007A,0000
 L003004?,R_CSEG,006A,0000
 L003001?,R_CSEG,006F,0000
+__str_10,R_CONST,00DD,0000
+__str_11,R_CONST,00E8,0000
 L004001?,R_CSEG,0082,0000
 L007007?,R_CSEG,00DA,0000
+L010002?,R_CSEG,017A,0000
 L007004?,R_CSEG,00D2,0000
 L007001?,R_CSEG,00CB,0000
 __str_0,R_CONST,0000,0000
-__str_1,R_CONST,0005,0000
-__str_2,R_CONST,0054,0000
-__str_3,R_CONST,005A,0000
-__str_4,R_CONST,0066,0000
-__str_5,R_CONST,006F,0000
-L008004?,R_CSEG,00F5,0000
-L008001?,R_CSEG,00E8,0000
+__str_1,R_CONST,0011,0000
+__str_2,R_CONST,0020,0000
+__str_3,R_CONST,0032,0000
+__str_4,R_CONST,004C,0000
+__str_5,R_CONST,006E,0000
+__str_6,R_CONST,0073,0000
+__str_7,R_CONST,00C2,0000
+__str_8,R_CONST,00C8,0000
+__str_9,R_CONST,00D4,0000
+L008004?,R_CSEG,0144,0000
+L008001?,R_CSEG,011E,0000
 L004011?,R_CSEG,00AE,0000
 L004010?,R_CSEG,0089,0000
 </LOCALS>
 
 <PUBLICS>
 _TIMER0_Init,R_CSEG,00B0,0000
-_main,R_CSEG,0101,0000
+_main,R_CSEG,0196,0000
 __c51_external_startup,R_CSEG,0000,0000
+_MPU6050_Init,R_CSEG,0150,0000
 _I2C_Write,R_CSEG,00C6,0000
 _I2C_Init,R_CSEG,00B9,0000
 _overflow_count,R_DSEG,0000,0001
+_Test_I2C,R_CSEG,0159,0000
 _Timer3us,R_CSEG,0054,0000
 _I2C_Read,R_CSEG,00E3,0000
 _waitms,R_CSEG,007E,0000
@@ -175,32 +184,18 @@ C2 8C
 AA 82
 43 C0 20
 E5 C0
-30 E0 rel3(L007001?;)
+30 E1 rel3(L007001?;)
 8A C2
 E5 C0
-30 E0 rel3(L007004?;)
+30 E1 rel3(L007004?;)
 85 data8(_I2C_Write_PARM_2;) C2
 E5 C0
-30 E0 rel3(L007007?;)
+30 E1 rel3(L007007?;)
 43 C0 10
 22
 AA 82
 43 C0 20
-E5 C0
-30 E0 rel3(L008001?;)
-EA
-2A
-FA
-74 01
-4A
-F5 C2
-E5 C0
-30 E0 rel3(L008004?;)
-85 C2 82
-43 C0 10
-22
-90 01 F4
-12 addr16(_waitms;)  
+C0 02
 74 data8(__str_0;)
 C0 E0
 74 data8(__str_0;0x0008;>>;)
@@ -211,24 +206,10 @@ C0 E0
 15 81
 15 81
 15 81
-74 data8(__str_4;)
-C0 E0
-74 data8(__str_4;0x0008;>>;)
-C0 E0
-74 80
-C0 E0
-74 data8(__str_3;)
-C0 E0
-74 data8(__str_3;0x0008;>>;)
-C0 E0
-74 80
-C0 E0
-74 data8(__str_2;)
-C0 E0
-74 data8(__str_2;0x0008;>>;)
-C0 E0
-74 80
-C0 E0
+AB C0
+7C 00
+C0 03
+C0 04
 74 data8(__str_1;)
 C0 E0
 74 data8(__str_1;0x0008;>>;)
@@ -237,18 +218,58 @@ C0 E0
 C0 E0
 12 addr16(_printf;)  
 E5 81
-24 F4
+24 FB
 F5 81
-12 addr16(_I2C_Init;)  
-75 82 68
+D0 02
+E5 C0
+30 E1 rel3(L008001?;)
+C0 02
+74 data8(__str_2;)
+C0 E0
+74 data8(__str_2;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+15 81
+15 81
+15 81
+D0 02
+EA
+2A
+FA
+74 01
+4A
+F5 C2
+E5 C0
+30 E1 rel3(L008004?;)
+85 C2 82
+43 C0 10
+22
+75 data8(_I2C_Write_PARM_2;) 00
+75 82 6B
+02 addr16(_I2C_Write;)  
+75 82 75
 12 addr16(_I2C_Read;)  
 AA 82
+BA 68 rel3(L010002?;)
+74 data8(__str_3;)
+C0 E0
+74 data8(__str_3;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+15 81
+15 81
+15 81
+22
 7B 00
 C0 02
 C0 03
-74 data8(__str_5;)
+74 data8(__str_4;)
 C0 E0
-74 data8(__str_5;0x0008;>>;)
+74 data8(__str_4;0x0008;>>;)
 C0 E0
 74 80
 C0 E0
@@ -257,6 +278,75 @@ E5 81
 24 FB
 F5 81
 22
+43 C0 10
+90 01 F4
+12 addr16(_waitms;)  
+74 data8(__str_5;)
+C0 E0
+74 data8(__str_5;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+15 81
+15 81
+15 81
+74 data8(__str_9;)
+C0 E0
+74 data8(__str_9;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+74 data8(__str_8;)
+C0 E0
+74 data8(__str_8;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+74 data8(__str_7;)
+C0 E0
+74 data8(__str_7;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+74 data8(__str_6;)
+C0 E0
+74 data8(__str_6;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+E5 81
+24 F4
+F5 81
+12 addr16(_I2C_Init;)  
+12 addr16(_MPU6050_Init;)  
+74 data8(__str_10;)
+C0 E0
+74 data8(__str_10;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+15 81
+15 81
+15 81
+53 C0 EF
+AA C0
+7B 00
+C0 02
+C0 03
+74 data8(__str_11;)
+C0 E0
+74 data8(__str_11;0x0008;>>;)
+C0 E0
+74 80
+C0 E0
+12 addr16(_printf;)  
+E5 81
+24 FB
+F5 81
+02 addr16(_Test_I2C;)  
 </CODE>
 
 <CODE R_CSEG>
@@ -266,6 +356,22 @@ F5 81
 </CODE>
 
 <CODE R_CONST>
+54 72 61 6E 73 66 65 72 20 73 74 61 72 74 65 64 
+00
+53 4D 42 30 43 4E 30 3A 20 25 30 32 58 
+0A
+00
+54 72 61 6E 73 66 65 72 20 63 6F 6D 70 6C 65 74 65
+
+00
+49 32 43 20 69 73 20 77 6F 72 6B 69 6E 67 20 63 6F
+72 72 65 63 74 6C 79 
+0A
+00
+49 32 43 20 69 73 20 6E 6F 74 20 77 6F 72 6B 69 6E
+67 20 63 6F 72 72 65 63 74 6C 79 3A 20 25 75 
+0A
+00
 1B
 5B 32 4A 
 00
@@ -284,9 +390,12 @@ F5 81
 00
 41 70 72 20 20 31 20 32 30 32 34 
 00
-30 30 3A 30 30 3A 31 37 
+31 31 3A 33 34 3A 31 39 
 00
-44 61 74 61 3A 20 25 75 
+49 6E 69 74 20 44 6F 6E 65 
+0A
+00
+25 30 32 58 
 0A
 00
 </CODE>

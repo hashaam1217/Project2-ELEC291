@@ -155,19 +155,19 @@ void I2C_Write(uint8_t addr, uint8_t data_input)
 	SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 
     // Wait for transfer complete
-    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+    while (!(SMB0CN0 & 0x02));
 
     // Write address 
     SMB0DAT = addr;
 
     // Wait for transfer complete
-    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+    while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
 
 	// Write data
     SMB0DAT = data_input;
 
     // Wait for transfer complete
-    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+    while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
 
     // Set stop condition
 	SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
@@ -180,14 +180,18 @@ uint8_t I2C_Read(uint8_t addr)
 	// Set start condition
 	SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 
+	printf("Transfer started");
+	printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
     // Wait for transfer complete
-    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+    while (!(SMB0CN0 & 0x02)); 
+	//printf("%02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+	printf("Transfer complete");
 
     // Write address with read bit set
     SMB0DAT = (addr << 1) | 1;
 
     // Wait for transfer complete
-    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+    while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
 
     // Read data
     data_output = SMB0DAT;
@@ -198,9 +202,29 @@ uint8_t I2C_Read(uint8_t addr)
     return data_output;
 }
 
+void MPU6050_Init()
+{
+	I2C_Write(0x6B, 0x00);
+}
+
+void Test_I2C()
+{
+	uint8_t data_in = I2C_Read(0x75);
+	if (data_in == 0x68)
+	{
+		printf("I2C is working correctly\n");
+	}
+
+	else 
+	{
+		printf("I2C is not working correctly: %u\n", data_in);
+	}
+}
+
 void main (void) 
 {
-	uint8_t data_storage;
+	//uint8_t data_storage;   
+	SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
 
 	waitms(500); // Give PuTTY a chance to start.
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
@@ -211,7 +235,17 @@ void main (void)
 	        __FILE__, __DATE__, __TIME__);
 
 	I2C_Init();
-	data_storage = I2C_Read(0x68);
-	printf("Data: %u\n", data_storage);
+	MPU6050_Init();
+	printf("Init Done\n");
+
+	SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
+	printf("%02X\n", SMB0CN0);
+
+	Test_I2C();
+
+	
+	//data_storage = I2C_Read(0x68);
+	//printf("Read Done\n");
+	//printf("Data: %u\n", data_storage);
 
 }
