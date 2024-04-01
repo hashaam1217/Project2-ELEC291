@@ -128,13 +128,13 @@ void I2C_Init()
 	P2MDOUT |= 0x03; //Set P2.0 (SDA) and P2.1(SCL) as Push pull mode
 	P2SKIP |= 0x03; // Skip Crossbar decoding for P2.0 and P2.1
 	//Enable I2C0 peripheral
-	I2C0N |= I2C0CN_I2CEN_ENABLE;
+	I2C0CN0 |= 0x40; // Sets it as 01000000 
 
 	// Setting clock rate for communication as 400KHz (Fast Mode)
 	// To set in the normal mode I2C0CKR would have to be 359, which is too big for the register
 	// Choosing between lowering the clock rate of the chip and increasing the rate of the I2C communication
 	// Chose to increase clock rate
-	I2C0CKR = 0x59;
+	SMB0CF = 0x59;
 }
 
 void I2C_Write(uint8_t addr, uint8_t data)
