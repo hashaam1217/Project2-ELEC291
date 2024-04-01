@@ -1,7 +1,7 @@
 0000              1   ;--------------------------------------------------------
 0000              2   ; File Created by C51
 0000              3   ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-0000              4   ; This file was generated Mon Apr 01 11:34:19 2024
+0000              4   ; This file was generated Mon Apr 01 11:48:55 2024
 0000              5   ;--------------------------------------------------------
                   5   $name MPU
                   6   $optc51 --model-small
@@ -952,74 +952,100 @@
 01EB F581       952            mov     sp,a
 01ED            953   ;        MPU.c:237: I2C_Init();
 01ED 120000     954            lcall   _I2C_Init
-01F0            955   ;        MPU.c:238: MPU6050_Init();
-01F0 120000     956            lcall   _MPU6050_Init
-01F3            957   ;        MPU.c:239: printf("Init Done\n");
-01F3 74F0       958            mov     a,#__str_10
-01F5 C0E0       959            push    acc
-01F7 74C5       960            mov     a,#(__str_10 >> 8)
-01F9 C0E0       961            push    acc
-01FB 7480       962            mov     a,#0x80
-01FD C0E0       963            push    acc
-01FF 120000     964            lcall   _printf
-0202 1581       965            dec     sp
-0204 1581       966            dec     sp
-0206 1581       967            dec     sp
-0208            968   ;        MPU.c:241: SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
-0208 53C0EF     969            anl     _SMB0CN0,#0xEF
-020B            970   ;        MPU.c:242: printf("%02X\n", SMB0CN0);
-020B AAC0       971            mov     r2,_SMB0CN0
-020D 7B00       972            mov     r3,#0x00
-020F C002       973            push    ar2
-0211 C003       974            push    ar3
-0213 7430       975            mov     a,#__str_11
-0215 C0E0       976            push    acc
-0217 74C6       977            mov     a,#(__str_11 >> 8)
-0219 C0E0       978            push    acc
-021B 7480       979            mov     a,#0x80
-021D C0E0       980            push    acc
-021F 120000     981            lcall   _printf
-0222 E581       982            mov     a,sp
-0224 24FB       983            add     a,#0xfb
-0226 F581       984            mov     sp,a
-0228            985   ;        MPU.c:244: Test_I2C();
-0228 020000     986            ljmp    _Test_I2C
-022B            987            rseg R_CSEG
-022B            988   
-0000            989            rseg R_XINIT
-0000            990   
-0000            991            rseg R_CONST
-0000            992   __str_0:
-0000 5472616E   993            db 'Transfer started'
+01F0            955   ;        MPU.c:238: printf("Init Done\n");
+01F0 74F0       956            mov     a,#__str_10
+01F2 C0E0       957            push    acc
+01F4 74C5       958            mov     a,#(__str_10 >> 8)
+01F6 C0E0       959            push    acc
+01F8 7480       960            mov     a,#0x80
+01FA C0E0       961            push    acc
+01FC 120000     962            lcall   _printf
+01FF 1581       963            dec     sp
+0201 1581       964            dec     sp
+0203 1581       965            dec     sp
+0205            966   ;        MPU.c:239: printf("%02X\n", SMB0CN0);
+0205 AAC0       967            mov     r2,_SMB0CN0
+0207 7B00       968            mov     r3,#0x00
+0209 C002       969            push    ar2
+020B C003       970            push    ar3
+020D 7430       971            mov     a,#__str_11
+020F C0E0       972            push    acc
+0211 74C6       973            mov     a,#(__str_11 >> 8)
+0213 C0E0       974            push    acc
+0215 7480       975            mov     a,#0x80
+0217 C0E0       976            push    acc
+0219 120000     977            lcall   _printf
+021C E581       978            mov     a,sp
+021E 24FB       979            add     a,#0xfb
+0220 F581       980            mov     sp,a
+0222            981   ;        MPU.c:240: SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
+0222 53C0EF     982            anl     _SMB0CN0,#0xEF
+0225            983   ;        MPU.c:241: printf("%02X\n", SMB0CN0);
+0225 AAC0       984            mov     r2,_SMB0CN0
+0227 7B00       985            mov     r3,#0x00
+0229 C002       986            push    ar2
+022B C003       987            push    ar3
+022D 7430       988            mov     a,#__str_11
+022F C0E0       989            push    acc
+0231 74C6       990            mov     a,#(__str_11 >> 8)
+0233 C0E0       991            push    acc
+0235 7480       992            mov     a,#0x80
+0237 C0E0       993            push    acc
+0239 120000     994            lcall   _printf
+023C E581       995            mov     a,sp
+023E 24FB       996            add     a,#0xfb
+0240 F581       997            mov     sp,a
+0242            998   ;        MPU.c:243: MPU6050_Init();
+0242 120000     999            lcall   _MPU6050_Init
+0245           1000   ;        MPU.c:245: printf("MPU6050 Init Done\n");
+0245 7470      1001            mov     a,#__str_12
+0247 C0E0      1002            push    acc
+0249 74C6      1003            mov     a,#(__str_12 >> 8)
+024B C0E0      1004            push    acc
+024D 7480      1005            mov     a,#0x80
+024F C0E0      1006            push    acc
+0251 120000    1007            lcall   _printf
+0254 1581      1008            dec     sp
+0256 1581      1009            dec     sp
+0258 1581      1010            dec     sp
+025A           1011   ;        MPU.c:248: Test_I2C();
+025A 020000    1012            ljmp    _Test_I2C
+025D           1013            rseg R_CSEG
+025D           1014   
+0000           1015            rseg R_XINIT
+0000           1016   
+0000           1017            rseg R_CONST
+0000           1018   __str_0:
+0000 5472616E  1019            db 'Transfer started'
      73666572
      20737461
      72746564
-0010 00         994            db 0x00
-0011            995   __str_1:
-0011 534D4230   996            db 'SMB0CN0: %02X'
+0010 00        1020            db 0x00
+0011           1021   __str_1:
+0011 534D4230  1022            db 'SMB0CN0: %02X'
      434E303A
      20253032
      58
-001E 0A         997            db 0x0A
-001F 00         998            db 0x00
-0020            999   __str_2:
-0020 5472616E  1000            db 'Transfer complete'
+001E 0A        1023            db 0x0A
+001F 00        1024            db 0x00
+0020           1025   __str_2:
+0020 5472616E  1026            db 'Transfer complete'
      73666572
      20636F6D
      706C6574
      65
-0031 00        1001            db 0x00
-0032           1002   __str_3:
-0032 49324320  1003            db 'I2C is working correctly'
+0031 00        1027            db 0x00
+0032           1028   __str_3:
+0032 49324320  1029            db 'I2C is working correctly'
      69732077
      6F726B69
      6E672063
      6F727265
      63746C79
-004A 0A        1004            db 0x0A
-004B 00        1005            db 0x00
-004C           1006   __str_4:
-004C 49324320  1007            db 'I2C is not working correctly: %u'
+004A 0A        1030            db 0x0A
+004B 00        1031            db 0x00
+004C           1032   __str_4:
+004C 49324320  1033            db 'I2C is not working correctly: %u'
      6973206E
      6F742077
      6F726B69
@@ -1027,14 +1053,14 @@
      6F727265
      63746C79
      3A202575
-006C 0A        1008            db 0x0A
-006D 00        1009            db 0x00
-006E           1010   __str_5:
-006E 1B        1011            db 0x1B
-006F 5B324A    1012            db '[2J'
-0072 00        1013            db 0x00
-0073           1014   __str_6:
-0073 45464D38  1015            db 'EFM8 Period measurement at pin P0.1 using Timer 0.'
+006C 0A        1034            db 0x0A
+006D 00        1035            db 0x00
+006E           1036   __str_5:
+006E 1B        1037            db 0x1B
+006F 5B324A    1038            db '[2J'
+0072 00        1039            db 0x00
+0073           1040   __str_6:
+0073 45464D38  1041            db 'EFM8 Period measurement at pin P0.1 using Timer 0.'
      20506572
      696F6420
      6D656173
@@ -1047,41 +1073,49 @@
      67205469
      6D657220
      302E
-00A5 0A        1016            db 0x0A
-00A6 46696C65  1017            db 'File: %s'
+00A5 0A        1042            db 0x0A
+00A6 46696C65  1043            db 'File: %s'
      3A202573
-00AE 0A        1018            db 0x0A
-00AF 436F6D70  1019            db 'Compiled: %s, %s'
+00AE 0A        1044            db 0x0A
+00AF 436F6D70  1045            db 'Compiled: %s, %s'
      696C6564
      3A202573
      2C202573
-00BF 0A        1020            db 0x0A
-00C0 0A        1021            db 0x0A
-00C1 00        1022            db 0x00
-00C2           1023   __str_7:
-00C2 4D50552E  1024            db 'MPU.c'
+00BF 0A        1046            db 0x0A
+00C0 0A        1047            db 0x0A
+00C1 00        1048            db 0x00
+00C2           1049   __str_7:
+00C2 4D50552E  1050            db 'MPU.c'
      63
-00C7 00        1025            db 0x00
-00C8           1026   __str_8:
-00C8 41707220  1027            db 'Apr  1 2024'
+00C7 00        1051            db 0x00
+00C8           1052   __str_8:
+00C8 41707220  1053            db 'Apr  1 2024'
      20312032
      303234
-00D3 00        1028            db 0x00
-00D4           1029   __str_9:
-00D4 31313A33  1030            db '11:34:19'
-     343A3139
-00DC 00        1031            db 0x00
-00DD           1032   __str_10:
-00DD 496E6974  1033            db 'Init Done'
+00D3 00        1054            db 0x00
+00D4           1055   __str_9:
+00D4 31313A34  1056            db '11:48:55'
+     383A3535
+00DC 00        1057            db 0x00
+00DD           1058   __str_10:
+00DD 496E6974  1059            db 'Init Done'
      20446F6E
      65
-00E6 0A        1034            db 0x0A
-00E7 00        1035            db 0x00
-00E8           1036   __str_11:
-00E8 25303258  1037            db '%02X'
-00EC 0A        1038            db 0x0A
-00ED 00        1039            db 0x00
-00EE           1040   
-0003           1041            CSEG
-0003           1042   
-0003           1043   end
+00E6 0A        1060            db 0x0A
+00E7 00        1061            db 0x00
+00E8           1062   __str_11:
+00E8 25303258  1063            db '%02X'
+00EC 0A        1064            db 0x0A
+00ED 00        1065            db 0x00
+00EE           1066   __str_12:
+00EE 4D505536  1067            db 'MPU6050 Init Done'
+     30353020
+     496E6974
+     20446F6E
+     65
+00FF 0A        1068            db 0x0A
+0100 00        1069            db 0x00
+0101           1070   
+0003           1071            CSEG
+0003           1072   
+0003           1073   end

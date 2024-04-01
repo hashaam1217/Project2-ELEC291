@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-; This file was generated Mon Apr 01 11:34:19 2024
+; This file was generated Mon Apr 01 11:48:55 2024
 ;--------------------------------------------------------
 $name MPU
 $optc51 --model-small
@@ -952,9 +952,7 @@ _main:
 	mov	sp,a
 ;	MPU.c:237: I2C_Init();
 	lcall	_I2C_Init
-;	MPU.c:238: MPU6050_Init();
-	lcall	_MPU6050_Init
-;	MPU.c:239: printf("Init Done\n");
+;	MPU.c:238: printf("Init Done\n");
 	mov	a,#__str_10
 	push	acc
 	mov	a,#(__str_10 >> 8)
@@ -965,9 +963,7 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	MPU.c:241: SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
-	anl	_SMB0CN0,#0xEF
-;	MPU.c:242: printf("%02X\n", SMB0CN0);
+;	MPU.c:239: printf("%02X\n", SMB0CN0);
 	mov	r2,_SMB0CN0
 	mov	r3,#0x00
 	push	ar2
@@ -982,7 +978,37 @@ _main:
 	mov	a,sp
 	add	a,#0xfb
 	mov	sp,a
-;	MPU.c:244: Test_I2C();
+;	MPU.c:240: SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
+	anl	_SMB0CN0,#0xEF
+;	MPU.c:241: printf("%02X\n", SMB0CN0);
+	mov	r2,_SMB0CN0
+	mov	r3,#0x00
+	push	ar2
+	push	ar3
+	mov	a,#__str_11
+	push	acc
+	mov	a,#(__str_11 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
+;	MPU.c:243: MPU6050_Init();
+	lcall	_MPU6050_Init
+;	MPU.c:245: printf("MPU6050 Init Done\n");
+	mov	a,#__str_12
+	push	acc
+	mov	a,#(__str_12 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	MPU.c:248: Test_I2C();
 	ljmp	_Test_I2C
 	rseg R_CSEG
 
@@ -1027,7 +1053,7 @@ __str_8:
 	db 'Apr  1 2024'
 	db 0x00
 __str_9:
-	db '11:34:19'
+	db '11:48:55'
 	db 0x00
 __str_10:
 	db 'Init Done'
@@ -1035,6 +1061,10 @@ __str_10:
 	db 0x00
 __str_11:
 	db '%02X'
+	db 0x0A
+	db 0x00
+__str_12:
+	db 'MPU6050 Init Done'
 	db 0x0A
 	db 0x00
 

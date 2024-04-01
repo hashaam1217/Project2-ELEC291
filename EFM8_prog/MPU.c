@@ -235,11 +235,15 @@ void main (void)
 	        __FILE__, __DATE__, __TIME__);
 
 	I2C_Init();
-	MPU6050_Init();
 	printf("Init Done\n");
-
+	printf("%02X\n", SMB0CN0);
 	SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
 	printf("%02X\n", SMB0CN0);
+
+	MPU6050_Init();
+
+	printf("MPU6050 Init Done\n");
+
 
 	Test_I2C();
 
