@@ -137,52 +137,71 @@ void I2C_Init()
 	SMB0CF = 0x59;
 }
 
-void I2C_Write(uint8_t addr, uint8_t data)
+void I2C_Write(uint8_t addr, uint8_t data_input)
 {
+	/**
+	 * SMB0CN0 Stands for System Management Bus Register
+	 * SMB0CNO has 8 bits: Master, TXMODE, STA, STO, ACKRQ, ARBLOST, ACK, SI
+	 * 					   [7]     [6]     [5]  [4]  [3]    [2]      [1]  [0]
+	 * The SI (System Interrupt) is set when a transfer is completed
+	 * Focusing on the higher for bits
+	 * STA and STO are used to generate start and stop conditions
+	 * TXMODE tells us whether we're transmitting or receiving
+	 * Master tells us whether we're Master or slave
+	 * More information is on page 310 on the manual document (Which is 394 pages)
+	*/
+
 	// Set start condition
-    I2C0CN |= I2C0CN_STA__SET;
+	SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 
     // Wait for transfer complete
-    while (!(I2C0CN & I2C0CN_SI__BMASK));
+    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
 
-    // Write address and data
-    I2C0DAT = addr;
-    I2C0DAT = data;
+    // Write address 
+    SMB0DAT = addr;
 
     // Wait for transfer complete
-    while (!(I2C0CN & I2C0CN_SI__BMASK));
+    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+
+	// Write data
+    SMB0DAT = data_input;
+
+    // Wait for transfer complete
+    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
 
     // Set stop condition
-    I2C0CN |= I2C0CN_STO__SET;
+	SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
 }
 
 uint8_t I2C_Read(uint8_t addr)
 {
-    uint8_t data;
+    uint8_t data_output;
 
-    // Set start condition
-    I2C0CN |= I2C0CN_STA__SET;
+	// Set start condition
+	SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 
     // Wait for transfer complete
-    while (!(I2C0CN & I2C0CN_SI__BMASK));
+    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
 
     // Write address with read bit set
-    I2C0DAT = (addr << 1) | 1;
+    SMB0DAT = (addr << 1) | 1;
 
     // Wait for transfer complete
-    while (!(I2C0CN & I2C0CN_SI__BMASK));
+    while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
 
     // Read data
-    data = I2C0DAT;
+    data_output = SMB0DAT;
 
     // Set stop condition
-    I2C0CN |= I2C0CN_STO__SET;
+	SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
 
-    return data;
+    return data_output;
 }
 
 void main (void) 
 {
+	uint8_t data_storage;
+
 	waitms(500); // Give PuTTY a chance to start.
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 
@@ -192,7 +211,7 @@ void main (void)
 	        __FILE__, __DATE__, __TIME__);
 
 	I2C_Init();
-	uint8_t data = I2C_Read(0x68);
-	printf("Data: %u\n", data);
+	data_storage = I2C_Read(0x68);
+	printf("Data: %u\n", data_storage);
 
 }

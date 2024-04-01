@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-; This file was generated Sun Mar 31 22:38:48 2024
+; This file was generated Mon Apr 01 00:00:17 2024
 ;--------------------------------------------------------
 $name MPU
 $optc51 --model-small
@@ -23,7 +23,11 @@ $optc51 --model-small
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
+	public _I2C_Write_PARM_2
 	public _main
+	public _I2C_Read
+	public _I2C_Write
+	public _I2C_Init
 	public _TIMER0_Init
 	public _waitms
 	public _Timer3us
@@ -483,6 +487,10 @@ _overflow_count:
 ; overlayable items in internal ram 
 ;--------------------------------------------------------
 	rseg	R_OSEG
+	rseg	R_OSEG
+_I2C_Write_PARM_2:
+	ds 1
+	rseg	R_OSEG
 ;--------------------------------------------------------
 ; indirectly addressable internal ram data
 ;--------------------------------------------------------
@@ -538,69 +546,69 @@ _overflow_count:
 ;Allocation info for local variables in function '_c51_external_startup'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	MPU.c:16: char _c51_external_startup (void)
+;	MPU.c:17: char _c51_external_startup (void)
 ;	-----------------------------------------
 ;	 function _c51_external_startup
 ;	-----------------------------------------
 __c51_external_startup:
 	using	0
-;	MPU.c:19: SFRPAGE = 0x00;
+;	MPU.c:20: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	MPU.c:20: WDTCN = 0xDE; //First key
+;	MPU.c:21: WDTCN = 0xDE; //First key
 	mov	_WDTCN,#0xDE
-;	MPU.c:21: WDTCN = 0xAD; //Second key
+;	MPU.c:22: WDTCN = 0xAD; //Second key
 	mov	_WDTCN,#0xAD
-;	MPU.c:23: VDM0CN |= 0x80;
+;	MPU.c:24: VDM0CN |= 0x80;
 	orl	_VDM0CN,#0x80
-;	MPU.c:24: RSTSRC = 0x02;
+;	MPU.c:25: RSTSRC = 0x02;
 	mov	_RSTSRC,#0x02
-;	MPU.c:31: SFRPAGE = 0x10;
+;	MPU.c:32: SFRPAGE = 0x10;
 	mov	_SFRPAGE,#0x10
-;	MPU.c:32: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
+;	MPU.c:33: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
 	mov	_PFE0CN,#0x20
-;	MPU.c:33: SFRPAGE = 0x00;
+;	MPU.c:34: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	MPU.c:54: CLKSEL = 0x00;
-	mov	_CLKSEL,#0x00
 ;	MPU.c:55: CLKSEL = 0x00;
 	mov	_CLKSEL,#0x00
-;	MPU.c:56: while ((CLKSEL & 0x80) == 0);
+;	MPU.c:56: CLKSEL = 0x00;
+	mov	_CLKSEL,#0x00
+;	MPU.c:57: while ((CLKSEL & 0x80) == 0);
 L002001?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002001?
-;	MPU.c:57: CLKSEL = 0x03;
-	mov	_CLKSEL,#0x03
 ;	MPU.c:58: CLKSEL = 0x03;
 	mov	_CLKSEL,#0x03
-;	MPU.c:59: while ((CLKSEL & 0x80) == 0);
+;	MPU.c:59: CLKSEL = 0x03;
+	mov	_CLKSEL,#0x03
+;	MPU.c:60: while ((CLKSEL & 0x80) == 0);
 L002004?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002004?
-;	MPU.c:64: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
+;	MPU.c:65: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
 	orl	_P0MDOUT,#0x10
-;	MPU.c:65: XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)                     
+;	MPU.c:66: XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)                     
 	mov	_XBR0,#0x01
-;	MPU.c:66: XBR1     = 0X00;
+;	MPU.c:67: XBR1     = 0X00;
 	mov	_XBR1,#0x00
-;	MPU.c:67: XBR2     = 0x40; // Enable crossbar and weak pull-ups
+;	MPU.c:68: XBR2     = 0x40; // Enable crossbar and weak pull-ups
 	mov	_XBR2,#0x40
-;	MPU.c:73: SCON0 = 0x10;
+;	MPU.c:74: SCON0 = 0x10;
 	mov	_SCON0,#0x10
-;	MPU.c:74: CKCON0 |= 0b_0000_0000 ; // Timer 1 uses the system clock divided by 12.
+;	MPU.c:75: CKCON0 |= 0b_0000_0000 ; // Timer 1 uses the system clock divided by 12.
 	mov	_CKCON0,_CKCON0
-;	MPU.c:75: TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
+;	MPU.c:76: TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
 	mov	_TH1,#0xE6
-;	MPU.c:76: TL1 = TH1;      // Init Timer1
+;	MPU.c:77: TL1 = TH1;      // Init Timer1
 	mov	_TL1,_TH1
-;	MPU.c:77: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
+;	MPU.c:78: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
 	anl	_TMOD,#0x0F
-;	MPU.c:78: TMOD |=  0x20;
+;	MPU.c:79: TMOD |=  0x20;
 	orl	_TMOD,#0x20
-;	MPU.c:79: TR1 = 1; // START Timer1
+;	MPU.c:80: TR1 = 1; // START Timer1
 	setb	_TR1
-;	MPU.c:80: TI = 1;  // Indicate TX0 ready
+;	MPU.c:81: TI = 1;  // Indicate TX0 ready
 	setb	_TI
-;	MPU.c:82: return 0;
+;	MPU.c:83: return 0;
 	mov	dpl,#0x00
 	ret
 ;------------------------------------------------------------
@@ -609,40 +617,40 @@ L002004?:
 ;us                        Allocated to registers r2 
 ;i                         Allocated to registers r3 
 ;------------------------------------------------------------
-;	MPU.c:86: void Timer3us(unsigned char us)
+;	MPU.c:87: void Timer3us(unsigned char us)
 ;	-----------------------------------------
 ;	 function Timer3us
 ;	-----------------------------------------
 _Timer3us:
 	mov	r2,dpl
-;	MPU.c:91: CKCON0|=0b_0100_0000;
+;	MPU.c:92: CKCON0|=0b_0100_0000;
 	orl	_CKCON0,#0x40
-;	MPU.c:93: TMR3RL = (-(SYSCLK)/1000000L); // Set Timer3 to overflow in 1us.
+;	MPU.c:94: TMR3RL = (-(SYSCLK)/1000000L); // Set Timer3 to overflow in 1us.
 	mov	_TMR3RL,#0xB8
 	mov	(_TMR3RL >> 8),#0xFF
-;	MPU.c:94: TMR3 = TMR3RL;                 // Initialize Timer3 for first overflow
+;	MPU.c:95: TMR3 = TMR3RL;                 // Initialize Timer3 for first overflow
 	mov	_TMR3,_TMR3RL
 	mov	(_TMR3 >> 8),(_TMR3RL >> 8)
-;	MPU.c:96: TMR3CN0 = 0x04;                 // Sart Timer3 and clear overflow flag
+;	MPU.c:97: TMR3CN0 = 0x04;                 // Sart Timer3 and clear overflow flag
 	mov	_TMR3CN0,#0x04
-;	MPU.c:97: for (i = 0; i < us; i++)       // Count <us> overflows
+;	MPU.c:98: for (i = 0; i < us; i++)       // Count <us> overflows
 	mov	r3,#0x00
 L003004?:
 	clr	c
 	mov	a,r3
 	subb	a,r2
 	jnc	L003007?
-;	MPU.c:99: while (!(TMR3CN0 & 0x80));  // Wait for overflow
+;	MPU.c:100: while (!(TMR3CN0 & 0x80));  // Wait for overflow
 L003001?:
 	mov	a,_TMR3CN0
 	jnb	acc.7,L003001?
-;	MPU.c:100: TMR3CN0 &= ~(0x80);         // Clear overflow indicator
+;	MPU.c:101: TMR3CN0 &= ~(0x80);         // Clear overflow indicator
 	anl	_TMR3CN0,#0x7F
-;	MPU.c:97: for (i = 0; i < us; i++)       // Count <us> overflows
+;	MPU.c:98: for (i = 0; i < us; i++)       // Count <us> overflows
 	inc	r3
 	sjmp	L003004?
 L003007?:
-;	MPU.c:102: TMR3CN0 = 0 ;                   // Stop Timer3 and clear overflow flag
+;	MPU.c:103: TMR3CN0 = 0 ;                   // Stop Timer3 and clear overflow flag
 	mov	_TMR3CN0,#0x00
 	ret
 ;------------------------------------------------------------
@@ -651,36 +659,36 @@ L003007?:
 ;ms                        Allocated to registers r2 r3 
 ;j                         Allocated to registers r2 r3 
 ;------------------------------------------------------------
-;	MPU.c:105: void waitms (unsigned int ms)
+;	MPU.c:106: void waitms (unsigned int ms)
 ;	-----------------------------------------
 ;	 function waitms
 ;	-----------------------------------------
 _waitms:
 	mov	r2,dpl
 	mov	r3,dph
-;	MPU.c:108: for(j=ms; j!=0; j--)
+;	MPU.c:109: for(j=ms; j!=0; j--)
 L004001?:
 	cjne	r2,#0x00,L004010?
 	cjne	r3,#0x00,L004010?
 	ret
 L004010?:
-;	MPU.c:110: Timer3us(249);
+;	MPU.c:111: Timer3us(249);
 	mov	dpl,#0xF9
 	push	ar2
 	push	ar3
 	lcall	_Timer3us
-;	MPU.c:111: Timer3us(249);
-	mov	dpl,#0xF9
-	lcall	_Timer3us
 ;	MPU.c:112: Timer3us(249);
 	mov	dpl,#0xF9
 	lcall	_Timer3us
-;	MPU.c:113: Timer3us(250);
+;	MPU.c:113: Timer3us(249);
+	mov	dpl,#0xF9
+	lcall	_Timer3us
+;	MPU.c:114: Timer3us(250);
 	mov	dpl,#0xFA
 	lcall	_Timer3us
 	pop	ar3
 	pop	ar2
-;	MPU.c:108: for(j=ms; j!=0; j--)
+;	MPU.c:109: for(j=ms; j!=0; j--)
 	dec	r2
 	cjne	r2,#0xff,L004011?
 	dec	r3
@@ -690,31 +698,118 @@ L004011?:
 ;Allocation info for local variables in function 'TIMER0_Init'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	MPU.c:117: void TIMER0_Init(void)
+;	MPU.c:118: void TIMER0_Init(void)
 ;	-----------------------------------------
 ;	 function TIMER0_Init
 ;	-----------------------------------------
 _TIMER0_Init:
-;	MPU.c:119: TMOD&=0b_1111_0000; // Set the bits of Timer/Counter 0 to zero
+;	MPU.c:120: TMOD&=0b_1111_0000; // Set the bits of Timer/Counter 0 to zero
 	anl	_TMOD,#0xF0
-;	MPU.c:120: TMOD|=0b_0000_0001; // Timer/Counter 0 used as a 16-bit timer
+;	MPU.c:121: TMOD|=0b_0000_0001; // Timer/Counter 0 used as a 16-bit timer
 	orl	_TMOD,#0x01
-;	MPU.c:121: TR0=0; // Stop Timer/Counter 0
+;	MPU.c:122: TR0=0; // Stop Timer/Counter 0
 	clr	_TR0
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_Init'
+;------------------------------------------------------------
+;------------------------------------------------------------
+;	MPU.c:125: void I2C_Init()
+;	-----------------------------------------
+;	 function I2C_Init
+;	-----------------------------------------
+_I2C_Init:
+;	MPU.c:128: P2MDOUT |= 0x03; //Set P2.0 (SDA) and P2.1(SCL) as Push pull mode
+	orl	_P2MDOUT,#0x03
+;	MPU.c:129: P2SKIP |= 0x03; // Skip Crossbar decoding for P2.0 and P2.1
+	orl	_P2SKIP,#0x03
+;	MPU.c:131: I2C0CN0 |= 0x40; // Sets it as 01000000 
+	orl	_I2C0CN0,#0x40
+;	MPU.c:137: SMB0CF = 0x59;
+	mov	_SMB0CF,#0x59
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_Write'
+;------------------------------------------------------------
+;data_input                Allocated with name '_I2C_Write_PARM_2'
+;addr                      Allocated to registers r2 
+;------------------------------------------------------------
+;	MPU.c:140: void I2C_Write(uint8_t addr, uint8_t data_input)
+;	-----------------------------------------
+;	 function I2C_Write
+;	-----------------------------------------
+_I2C_Write:
+	mov	r2,dpl
+;	MPU.c:155: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+	orl	_SMB0CN0,#0x20
+;	MPU.c:158: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+L007001?:
+	mov	a,_SMB0CN0
+	jnb	acc.0,L007001?
+;	MPU.c:161: SMB0DAT = addr;
+	mov	_SMB0DAT,r2
+;	MPU.c:164: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+L007004?:
+	mov	a,_SMB0CN0
+	jnb	acc.0,L007004?
+;	MPU.c:167: SMB0DAT = data_input;
+	mov	_SMB0DAT,_I2C_Write_PARM_2
+;	MPU.c:170: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+L007007?:
+	mov	a,_SMB0CN0
+	jnb	acc.0,L007007?
+;	MPU.c:173: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+	orl	_SMB0CN0,#0x10
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_Read'
+;------------------------------------------------------------
+;addr                      Allocated to registers r2 
+;data_output               Allocated to registers 
+;------------------------------------------------------------
+;	MPU.c:176: uint8_t I2C_Read(uint8_t addr)
+;	-----------------------------------------
+;	 function I2C_Read
+;	-----------------------------------------
+_I2C_Read:
+	mov	r2,dpl
+;	MPU.c:181: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+	orl	_SMB0CN0,#0x20
+;	MPU.c:184: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+L008001?:
+	mov	a,_SMB0CN0
+	jnb	acc.0,L008001?
+;	MPU.c:187: SMB0DAT = (addr << 1) | 1;
+	mov	a,r2
+	add	a,r2
+	mov	r2,a
+	mov	a,#0x01
+	orl	a,r2
+	mov	_SMB0DAT,a
+;	MPU.c:190: while (!(SMB0CN0 & 0x01)); //Waiting for SMB0CN0.0 (SI) to indicate transfer complete
+L008004?:
+	mov	a,_SMB0CN0
+	jnb	acc.0,L008004?
+;	MPU.c:193: data_output = SMB0DAT;
+	mov	dpl,_SMB0DAT
+;	MPU.c:196: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+	orl	_SMB0CN0,#0x10
+;	MPU.c:198: return data_output;
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'main'
 ;------------------------------------------------------------
+;data_storage              Allocated to registers r2 
 ;------------------------------------------------------------
-;	MPU.c:124: void main (void) 
+;	MPU.c:201: void main (void) 
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	MPU.c:126: waitms(500); // Give PuTTY a chance to start.
+;	MPU.c:205: waitms(500); // Give PuTTY a chance to start.
 	mov	dptr,#0x01F4
 	lcall	_waitms
-;	MPU.c:127: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+;	MPU.c:206: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	mov	a,#__str_0
 	push	acc
 	mov	a,#(__str_0 >> 8)
@@ -725,8 +820,8 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	MPU.c:132: __FILE__, __DATE__, __TIME__);
-;	MPU.c:131: "Compiled: %s, %s\n\n",
+;	MPU.c:211: __FILE__, __DATE__, __TIME__);
+;	MPU.c:210: "Compiled: %s, %s\n\n",
 	mov	a,#__str_4
 	push	acc
 	mov	a,#(__str_4 >> 8)
@@ -755,6 +850,26 @@ _main:
 	mov	a,sp
 	add	a,#0xf4
 	mov	sp,a
+;	MPU.c:213: I2C_Init();
+	lcall	_I2C_Init
+;	MPU.c:214: data_storage = I2C_Read(0x68);
+	mov	dpl,#0x68
+	lcall	_I2C_Read
+	mov	r2,dpl
+;	MPU.c:215: printf("Data: %u\n", data_storage);
+	mov	r3,#0x00
+	push	ar2
+	push	ar3
+	mov	a,#__str_5
+	push	acc
+	mov	a,#(__str_5 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
 	ret
 	rseg R_CSEG
 
@@ -778,10 +893,14 @@ __str_2:
 	db 'MPU.c'
 	db 0x00
 __str_3:
-	db 'Mar 31 2024'
+	db 'Apr  1 2024'
 	db 0x00
 __str_4:
-	db '22:38:48'
+	db '00:00:17'
+	db 0x00
+__str_5:
+	db 'Data: %u'
+	db 0x0A
 	db 0x00
 
 	CSEG
