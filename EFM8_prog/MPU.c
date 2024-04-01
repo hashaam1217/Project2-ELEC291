@@ -7,6 +7,7 @@
 
 #include <EFM8LB1.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #define SYSCLK      72000000L  // SYSCLK frequency in Hz
 #define BAUDRATE      115200L  // Baud rate of UART in bps
@@ -155,6 +156,31 @@ void I2C_Write(uint8_t addr, uint8_t data)
     I2C0CN |= I2C0CN_STO__SET;
 }
 
+uint8_t I2C_Read(uint8_t addr)
+{
+    uint8_t data;
+
+    // Set start condition
+    I2C0CN |= I2C0CN_STA__SET;
+
+    // Wait for transfer complete
+    while (!(I2C0CN & I2C0CN_SI__BMASK));
+
+    // Write address with read bit set
+    I2C0DAT = (addr << 1) | 1;
+
+    // Wait for transfer complete
+    while (!(I2C0CN & I2C0CN_SI__BMASK));
+
+    // Read data
+    data = I2C0DAT;
+
+    // Set stop condition
+    I2C0CN |= I2C0CN_STO__SET;
+
+    return data;
+}
+
 void main (void) 
 {
 	waitms(500); // Give PuTTY a chance to start.
@@ -164,5 +190,9 @@ void main (void)
 	        "File: %s\n"
 	        "Compiled: %s, %s\n\n",
 	        __FILE__, __DATE__, __TIME__);
+
+	I2C_Init();
+	uint8_t data = I2C_Read(0x68);
+	printf("Data: %u\n", data);
 
 }
