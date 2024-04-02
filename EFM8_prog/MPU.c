@@ -127,24 +127,22 @@ void I2C_Init()
 	//Configure SDA and SCL pins (setting them to push and pull mode)
 	// TODO: VERIFY P2MDOUT and P2SKIP
 	P2MDOUT |= 0x03; //Set P2.0 (SDA) and P2.1(SCL) as Push pull mode
-	P2SKIP |= 0x03; // Skip Crossbar decoding for P2.0 and P2.1
+	//P2SKIP |= 0x03; // Skip Crossbar decoding for P2.0 and P2.1
 	//Enable I2C0 peripheral
 	//I2C0CN0 |= 0x40; // Sets it as 01000000 
+	XBR0 |= 0x04;
 
-	// Setting clock rate for communication as 400KHz (Fast Mode)
-	// To set in the normal mode I2C0CKR would have to be 359, which is too big for the register
-	// Choosing between lowering the clock rate of the chip and increasing the rate of the I2C communication
-	// Chose to increase clock rate
+	//Setting 1100000 for ENSMB and INH
 	SMB0CF 	= 0x00;
 	SMB0CF |= 0xC0;
-
-	// SMB0CN0 110000
-	//SMB0CN0 = 0xC0;
-	 
 
 	// Setting the EHACK bit on in the SMB0ADM register to enable hardware acknowledgment
 	// of slave addresses and received databytes
 	SMB0ADM |= 0x01;
+
+	IE |= 0x80; //Global Enable all interrupts
+	EIE1 |= 0x01; //SMBus interrupts enable
+
 }
 
 void I2C_Write(uint8_t addr, uint8_t data_input)
@@ -211,7 +209,29 @@ uint8_t I2C_Read(uint8_t addr)
 	// Set start condition
 	SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
 
-	printf("Transfer started");
+	while (SMB0CN0 & 0x20)
+	{
+		//Clear the STA and STO Flags
+		SMB0CN0 &= ~(0x30);
+		//Write SMB0DAT with the slave address and R/W bit set to 1
+		SMB0DAT = (addr << 1) | 0x01;
+		// Clear the interrupt flag
+		SMB0CN0 &= ~(0x01);
+
+		if (SMB0CN0 & 0x02)
+		{
+			printf("ACK recieved\n");
+		}
+
+		else
+		{
+			SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+			SMB0CN0 &= ~(0x01); // Clear SI
+		}
+	}
+	printf("Loop exited\n");
+
+	printf("Transfer started\n");
 	printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
     // Wait for transfer complete
     while (!(SMB0CN0 & 0x02)); 
@@ -241,6 +261,8 @@ void MPU6050_Init()
 void Test_I2C()
 {
 	uint8_t data_in = I2C_Read(0x75);
+	printf("I2C: %u\n", data_in);
+
 	if (data_in == 0x68)
 	{
 		printf("I2C is working correctly\n");
@@ -272,11 +294,11 @@ void main (void)
 	//SMB0CN0 &= ~0x10; // Clear SMB0CN0.4 (STO)
 	printf("%02X\n", SMB0CN0);
 
-	MPU6050_Init();
+	//MPU6050_Init();
+	//printf("MPU6050 Init Done\n");
 
-	printf("MPU6050 Init Done\n");
 
-
+	printf("Starting to read\n");
 	Test_I2C();
 
 	

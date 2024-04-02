@@ -1,7 +1,7 @@
 0000              1   ;--------------------------------------------------------
 0000              2   ; File Created by C51
 0000              3   ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-0000              4   ; This file was generated Mon Apr 01 17:08:20 2024
+0000              4   ; This file was generated Tue Apr 02 13:10:42 2024
 0000              5   ;--------------------------------------------------------
                   5   $name MPU
                   6   $optc51 --model-small
@@ -721,409 +721,487 @@
 00B9            721   _I2C_Init:
 00B9            722   ;        MPU.c:129: P2MDOUT |= 0x03; //Set P2.0 (SDA) and P2.1(SCL) as Push pull mode
 00B9 43A603     723            orl     _P2MDOUT,#0x03
-00BC            724   ;        MPU.c:130: P2SKIP |= 0x03; // Skip Crossbar decoding for P2.0 and P2.1
-00BC 43CC03     725            orl     _P2SKIP,#0x03
-00BF            726   ;        MPU.c:138: SMB0CF       = 0x00;
+00BC            724   ;        MPU.c:133: XBR0 |= 0x04;
+00BC 43E104     725            orl     _XBR0,#0x04
+00BF            726   ;        MPU.c:136: SMB0CF       = 0x00;
 00BF 75C100     727            mov     _SMB0CF,#0x00
-00C2            728   ;        MPU.c:139: SMB0CF |= 0xC0;
+00C2            728   ;        MPU.c:137: SMB0CF |= 0xC0;
 00C2 43C1C0     729            orl     _SMB0CF,#0xC0
-00C5            730   ;        MPU.c:147: SMB0ADM |= 0x01;
+00C5            730   ;        MPU.c:141: SMB0ADM |= 0x01;
 00C5 43D601     731            orl     _SMB0ADM,#0x01
-00C8 22         732            ret
-00C9            733   ;------------------------------------------------------------
-00C9            734   ;Allocation info for local variables in function 'I2C_Write'
-00C9            735   ;------------------------------------------------------------
-00C9            736   ;data_input                Allocated with name '_I2C_Write_PARM_2'
-00C9            737   ;addr                      Allocated to registers r2 
-00C9            738   ;------------------------------------------------------------
-00C9            739   ;        MPU.c:150: void I2C_Write(uint8_t addr, uint8_t data_input)
-00C9            740   ;        -----------------------------------------
-00C9            741   ;         function I2C_Write
-00C9            742   ;        -----------------------------------------
-00C9            743   _I2C_Write:
-00C9 AA82       744            mov     r2,dpl
-00CB            745   ;        MPU.c:165: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-00CB 43C020     746            orl     _SMB0CN0,#0x20
-00CE            747   ;        MPU.c:167: while (SMB0CN0 & 0x20)
-00CE EA         748            mov     a,r2
-00CF 2A         749            add     a,r2
-00D0 FA         750            mov     r2,a
-00D1 430201     751            orl     ar2,#0x01
-00D4            752   L007004?:
-00D4 E5C0       753            mov     a,_SMB0CN0
-00D6 30E5B0     754            jnb     acc.5,L007006?
-00D9            755   ;        MPU.c:170: SMB0CN0 &= ~(0x30);
-00D9 53C0CF     756            anl     _SMB0CN0,#0xCF
-00DC            757   ;        MPU.c:172: SMB0DAT = (addr << 1) | 0x01;
-00DC 8AC2       758            mov     _SMB0DAT,r2
-00DE            759   ;        MPU.c:174: SMB0CN0 &= ~(0x01);
-00DE 53C0FE     760            anl     _SMB0CN0,#0xFE
-00E1            761   ;        MPU.c:176: if (SMB0CN0 & 0x02)
-00E1 E5C0       762            mov     a,_SMB0CN0
-00E3 30E1F0     763            jnb     acc.1,L007002?
-00E6            764   ;        MPU.c:178: printf("ACK recieved\n");
-00E6 C002       765            push    ar2
-00E8 7430       766            mov     a,#__str_0
-00EA C0E0       767            push    acc
-00EC 74C2       768            mov     a,#(__str_0 >> 8)
-00EE C0E0       769            push    acc
-00F0 7480       770            mov     a,#0x80
-00F2 C0E0       771            push    acc
-00F4 120000     772            lcall   _printf
-00F7 1581       773            dec     sp
-00F9 1581       774            dec     sp
-00FB 1581       775            dec     sp
-00FD D002       776            pop     ar2
-00FF 8000       777            sjmp    L007004?
-0101            778   L007002?:
-0101            779   ;        MPU.c:183: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-0101 43C020     780            orl     _SMB0CN0,#0x20
-0104            781   ;        MPU.c:184: SMB0CN0 &= ~(0x01); // Clear SI
-0104 53C0FE     782            anl     _SMB0CN0,#0xFE
-0107 8000       783            sjmp    L007004?
-0109            784   L007006?:
-0109            785   ;        MPU.c:187: printf("Loop exited\n");
-0109 74F0       786            mov     a,#__str_1
-010B C0E0       787            push    acc
-010D 74C2       788            mov     a,#(__str_1 >> 8)
-010F C0E0       789            push    acc
-0111 7480       790            mov     a,#0x80
-0113 C0E0       791            push    acc
-0115 120000     792            lcall   _printf
-0118 1581       793            dec     sp
-011A 1581       794            dec     sp
-011C 1581       795            dec     sp
-011E            796   ;        MPU.c:189: while (!(SMB0CN0 & 0x02));
-011E            797   L007007?:
-011E E5C0       798            mov     a,_SMB0CN0
-0120 30E130     799            jnb     acc.1,L007007?
-0123            800   ;        MPU.c:190: printf("Cleared interrupt flag\n");
-0123 7470       801            mov     a,#__str_2
-0125 C0E0       802            push    acc
-0127 74C3       803            mov     a,#(__str_2 >> 8)
-0129 C0E0       804            push    acc
-012B 7480       805            mov     a,#0x80
-012D C0E0       806            push    acc
-012F 120000     807            lcall   _printf
-0132 1581       808            dec     sp
-0134 1581       809            dec     sp
-0136 1581       810            dec     sp
-0138            811   ;        MPU.c:195: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-0138            812   L007010?:
-0138 E5C0       813            mov     a,_SMB0CN0
-013A 30E1B0     814            jnb     acc.1,L007010?
-013D            815   ;        MPU.c:198: SMB0DAT = data_input;
-013D 8570C2     816            mov     _SMB0DAT,_I2C_Write_PARM_2
-0140            817   ;        MPU.c:201: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-0140            818   L007013?:
-0140 E5C0       819            mov     a,_SMB0CN0
-0142 30E1F0     820            jnb     acc.1,L007013?
-0145            821   ;        MPU.c:204: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
-0145 43C010     822            orl     _SMB0CN0,#0x10
-0148 22         823            ret
-0149            824   ;------------------------------------------------------------
-0149            825   ;Allocation info for local variables in function 'I2C_Read'
-0149            826   ;------------------------------------------------------------
-0149            827   ;addr                      Allocated to registers r2 
-0149            828   ;data_output               Allocated to registers 
-0149            829   ;------------------------------------------------------------
-0149            830   ;        MPU.c:207: uint8_t I2C_Read(uint8_t addr)
-0149            831   ;        -----------------------------------------
-0149            832   ;         function I2C_Read
-0149            833   ;        -----------------------------------------
-0149            834   _I2C_Read:
-0149 AA82       835            mov     r2,dpl
-014B            836   ;        MPU.c:212: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-014B 43C020     837            orl     _SMB0CN0,#0x20
-014E            838   ;        MPU.c:214: printf("Transfer started");
-014E C002       839            push    ar2
-0150 7430       840            mov     a,#__str_3
-0152 C0E0       841            push    acc
-0154 74C4       842            mov     a,#(__str_3 >> 8)
-0156 C0E0       843            push    acc
-0158 7480       844            mov     a,#0x80
-015A C0E0       845            push    acc
-015C 120000     846            lcall   _printf
-015F 1581       847            dec     sp
-0161 1581       848            dec     sp
-0163 1581       849            dec     sp
-0165            850   ;        MPU.c:215: printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-0165 ABC0       851            mov     r3,_SMB0CN0
-0167 7C00       852            mov     r4,#0x00
-0169 C003       853            push    ar3
-016B C004       854            push    ar4
-016D 7470       855            mov     a,#__str_4
-016F C0E0       856            push    acc
-0171 74C4       857            mov     a,#(__str_4 >> 8)
-0173 C0E0       858            push    acc
-0175 7480       859            mov     a,#0x80
-0177 C0E0       860            push    acc
-0179 120000     861            lcall   _printf
-017C E581       862            mov     a,sp
-017E 24FB       863            add     a,#0xfb
-0180 F581       864            mov     sp,a
-0182 D002       865            pop     ar2
-0184            866   ;        MPU.c:217: while (!(SMB0CN0 & 0x02)); 
-0184            867   L008001?:
-0184 E5C0       868            mov     a,_SMB0CN0
-0186 30E1B0     869            jnb     acc.1,L008001?
-0189            870   ;        MPU.c:219: printf("Transfer complete");
-0189 C002       871            push    ar2
-018B 74F0       872            mov     a,#__str_5
-018D C0E0       873            push    acc
-018F 74C4       874            mov     a,#(__str_5 >> 8)
-0191 C0E0       875            push    acc
-0193 7480       876            mov     a,#0x80
-0195 C0E0       877            push    acc
-0197 120000     878            lcall   _printf
-019A 1581       879            dec     sp
-019C 1581       880            dec     sp
-019E 1581       881            dec     sp
-01A0 D002       882            pop     ar2
-01A2            883   ;        MPU.c:222: SMB0DAT = (addr << 1) | 1;
-01A2 EA         884            mov     a,r2
-01A3 2A         885            add     a,r2
-01A4 FA         886            mov     r2,a
-01A5 7401       887            mov     a,#0x01
-01A7 4A         888            orl     a,r2
-01A8 F5C2       889            mov     _SMB0DAT,a
-01AA            890   ;        MPU.c:225: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-01AA            891   L008004?:
-01AA E5C0       892            mov     a,_SMB0CN0
-01AC 30E130     893            jnb     acc.1,L008004?
-01AF            894   ;        MPU.c:228: data_output = SMB0DAT;
-01AF 85C282     895            mov     dpl,_SMB0DAT
-01B2            896   ;        MPU.c:231: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
-01B2 43C010     897            orl     _SMB0CN0,#0x10
-01B5            898   ;        MPU.c:233: return data_output;
-01B5 22         899            ret
-01B6            900   ;------------------------------------------------------------
-01B6            901   ;Allocation info for local variables in function 'MPU6050_Init'
-01B6            902   ;------------------------------------------------------------
-01B6            903   ;------------------------------------------------------------
-01B6            904   ;        MPU.c:236: void MPU6050_Init()
-01B6            905   ;        -----------------------------------------
-01B6            906   ;         function MPU6050_Init
-01B6            907   ;        -----------------------------------------
-01B6            908   _MPU6050_Init:
-01B6            909   ;        MPU.c:238: I2C_Write(0x6B, 0x00);
-01B6 757000     910            mov     _I2C_Write_PARM_2,#0x00
-01B9 75826B     911            mov     dpl,#0x6B
-01BC 020000     912            ljmp    _I2C_Write
-01BF            913   ;------------------------------------------------------------
-01BF            914   ;Allocation info for local variables in function 'Test_I2C'
-01BF            915   ;------------------------------------------------------------
-01BF            916   ;data_in                   Allocated to registers r2 
-01BF            917   ;------------------------------------------------------------
-01BF            918   ;        MPU.c:241: void Test_I2C()
-01BF            919   ;        -----------------------------------------
-01BF            920   ;         function Test_I2C
-01BF            921   ;        -----------------------------------------
-01BF            922   _Test_I2C:
-01BF            923   ;        MPU.c:243: uint8_t data_in = I2C_Read(0x75);
-01BF 758275     924            mov     dpl,#0x75
-01C2 120000     925            lcall   _I2C_Read
-01C5 AA82       926            mov     r2,dpl
-01C7            927   ;        MPU.c:244: if (data_in == 0x68)
-01C7 BA6870     928            cjne    r2,#0x68,L010002?
-01CA            929   ;        MPU.c:246: printf("I2C is working correctly\n");
-01CA 74B0       930            mov     a,#__str_6
-01CC C0E0       931            push    acc
-01CE 74C5       932            mov     a,#(__str_6 >> 8)
-01D0 C0E0       933            push    acc
-01D2 7480       934            mov     a,#0x80
-01D4 C0E0       935            push    acc
-01D6 120000     936            lcall   _printf
-01D9 1581       937            dec     sp
-01DB 1581       938            dec     sp
-01DD 1581       939            dec     sp
-01DF 22         940            ret
-01E0            941   L010002?:
-01E0            942   ;        MPU.c:251: printf("I2C is not working correctly: %u\n", data_in);
-01E0 7B00       943            mov     r3,#0x00
-01E2 C002       944            push    ar2
-01E4 C003       945            push    ar3
-01E6 74F0       946            mov     a,#__str_7
-01E8 C0E0       947            push    acc
-01EA 74C5       948            mov     a,#(__str_7 >> 8)
-01EC C0E0       949            push    acc
-01EE 7480       950            mov     a,#0x80
-01F0 C0E0       951            push    acc
-01F2 120000     952            lcall   _printf
-01F5 E581       953            mov     a,sp
-01F7 24FB       954            add     a,#0xfb
-01F9 F581       955            mov     sp,a
-01FB 22         956            ret
-01FC            957   ;------------------------------------------------------------
-01FC            958   ;Allocation info for local variables in function 'main'
-01FC            959   ;------------------------------------------------------------
-01FC            960   ;------------------------------------------------------------
-01FC            961   ;        MPU.c:255: void main (void) 
-01FC            962   ;        -----------------------------------------
-01FC            963   ;         function main
-01FC            964   ;        -----------------------------------------
-01FC            965   _main:
-01FC            966   ;        MPU.c:260: waitms(500); // Give PuTTY a chance to start.
-01FC 9001F4     967            mov     dptr,#0x01F4
-01FF 120000     968            lcall   _waitms
-0202            969   ;        MPU.c:261: printf("\x1b[2J \n"); // Clear screen using ANSI escape sequence.
-0202 7430       970            mov     a,#__str_8
-0204 C0E0       971            push    acc
-0206 74C6       972            mov     a,#(__str_8 >> 8)
-0208 C0E0       973            push    acc
-020A 7480       974            mov     a,#0x80
-020C C0E0       975            push    acc
-020E 120000     976            lcall   _printf
-0211 1581       977            dec     sp
-0213 1581       978            dec     sp
-0215 1581       979            dec     sp
-0217            980   ;        MPU.c:266: __FILE__, __DATE__, __TIME__);
-0217            981   ;        MPU.c:265: "Compiled: %s, %s\n\n",
-0217 7470       982            mov     a,#__str_12
-0219 C0E0       983            push    acc
-021B 74C6       984            mov     a,#(__str_12 >> 8)
-021D C0E0       985            push    acc
-021F 7480       986            mov     a,#0x80
-0221 C0E0       987            push    acc
-0223 74B0       988            mov     a,#__str_11
-0225 C0E0       989            push    acc
-0227 74C6       990            mov     a,#(__str_11 >> 8)
-0229 C0E0       991            push    acc
-022B 7480       992            mov     a,#0x80
-022D C0E0       993            push    acc
-022F 74F0       994            mov     a,#__str_10
-0231 C0E0       995            push    acc
-0233 74C6       996            mov     a,#(__str_10 >> 8)
-0235 C0E0       997            push    acc
-0237 7480       998            mov     a,#0x80
-0239 C0E0       999            push    acc
-023B 7430      1000            mov     a,#__str_9
-023D C0E0      1001            push    acc
-023F 74C7      1002            mov     a,#(__str_9 >> 8)
-0241 C0E0      1003            push    acc
-0243 7480      1004            mov     a,#0x80
-0245 C0E0      1005            push    acc
-0247 120000    1006            lcall   _printf
-024A E581      1007            mov     a,sp
-024C 24F4      1008            add     a,#0xf4
-024E F581      1009            mov     sp,a
-0250           1010   ;        MPU.c:268: I2C_Init();
-0250 120000    1011            lcall   _I2C_Init
-0253           1012   ;        MPU.c:269: printf("Init Done\n");
-0253 7470      1013            mov     a,#__str_13
-0255 C0E0      1014            push    acc
-0257 74C7      1015            mov     a,#(__str_13 >> 8)
-0259 C0E0      1016            push    acc
-025B 7480      1017            mov     a,#0x80
-025D C0E0      1018            push    acc
-025F 120000    1019            lcall   _printf
-0262 1581      1020            dec     sp
-0264 1581      1021            dec     sp
-0266 1581      1022            dec     sp
-0268           1023   ;        MPU.c:270: SMB0CN0 |= 0xE0; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-0268 43C0E0    1024            orl     _SMB0CN0,#0xE0
-026B           1025   ;        MPU.c:271: printf("%02X\n", SMB0CN0);
-026B AAC0      1026            mov     r2,_SMB0CN0
-026D 7B00      1027            mov     r3,#0x00
-026F C002      1028            push    ar2
-0271 C003      1029            push    ar3
-0273 74B0      1030            mov     a,#__str_14
-0275 C0E0      1031            push    acc
-0277 74C7      1032            mov     a,#(__str_14 >> 8)
-0279 C0E0      1033            push    acc
-027B 7480      1034            mov     a,#0x80
-027D C0E0      1035            push    acc
-027F 120000    1036            lcall   _printf
-0282 E581      1037            mov     a,sp
-0284 24FB      1038            add     a,#0xfb
-0286 F581      1039            mov     sp,a
-0288           1040   ;        MPU.c:273: printf("%02X\n", SMB0CN0);
-0288 AAC0      1041            mov     r2,_SMB0CN0
-028A 7B00      1042            mov     r3,#0x00
-028C C002      1043            push    ar2
-028E C003      1044            push    ar3
-0290 74B0      1045            mov     a,#__str_14
-0292 C0E0      1046            push    acc
-0294 74C7      1047            mov     a,#(__str_14 >> 8)
-0296 C0E0      1048            push    acc
-0298 7480      1049            mov     a,#0x80
-029A C0E0      1050            push    acc
-029C 120000    1051            lcall   _printf
-029F E581      1052            mov     a,sp
-02A1 24FB      1053            add     a,#0xfb
-02A3 F581      1054            mov     sp,a
-02A5           1055   ;        MPU.c:275: MPU6050_Init();
-02A5 120000    1056            lcall   _MPU6050_Init
-02A8           1057   ;        MPU.c:277: printf("MPU6050 Init Done\n");
-02A8 74F0      1058            mov     a,#__str_15
-02AA C0E0      1059            push    acc
-02AC 74C7      1060            mov     a,#(__str_15 >> 8)
-02AE C0E0      1061            push    acc
-02B0 7480      1062            mov     a,#0x80
-02B2 C0E0      1063            push    acc
-02B4 120000    1064            lcall   _printf
-02B7 1581      1065            dec     sp
-02B9 1581      1066            dec     sp
-02BB 1581      1067            dec     sp
-02BD           1068   ;        MPU.c:280: Test_I2C();
-02BD 020000    1069            ljmp    _Test_I2C
-02C0           1070            rseg R_CSEG
-02C0           1071   
-0000           1072            rseg R_XINIT
-0000           1073   
-0000           1074            rseg R_CONST
-0000           1075   __str_0:
-0000 41434B20  1076            db 'ACK recieved'
+00C8            732   ;        MPU.c:143: IE |= 0x80; //Global Enable all interrupts
+00C8 43A880     733            orl     _IE,#0x80
+00CB            734   ;        MPU.c:144: EIE1 |= 0x01; //SMBus interrupts enable
+00CB 43E601     735            orl     _EIE1,#0x01
+00CE 22         736            ret
+00CF            737   ;------------------------------------------------------------
+00CF            738   ;Allocation info for local variables in function 'I2C_Write'
+00CF            739   ;------------------------------------------------------------
+00CF            740   ;data_input                Allocated with name '_I2C_Write_PARM_2'
+00CF            741   ;addr                      Allocated to registers r2 
+00CF            742   ;------------------------------------------------------------
+00CF            743   ;        MPU.c:148: void I2C_Write(uint8_t addr, uint8_t data_input)
+00CF            744   ;        -----------------------------------------
+00CF            745   ;         function I2C_Write
+00CF            746   ;        -----------------------------------------
+00CF            747   _I2C_Write:
+00CF AA82       748            mov     r2,dpl
+00D1            749   ;        MPU.c:163: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+00D1 43C020     750            orl     _SMB0CN0,#0x20
+00D4            751   ;        MPU.c:165: while (SMB0CN0 & 0x20)
+00D4 EA         752            mov     a,r2
+00D5 2A         753            add     a,r2
+00D6 FA         754            mov     r2,a
+00D7 430201     755            orl     ar2,#0x01
+00DA            756   L007004?:
+00DA E5C0       757            mov     a,_SMB0CN0
+00DC 30E5B0     758            jnb     acc.5,L007006?
+00DF            759   ;        MPU.c:168: SMB0CN0 &= ~(0x30);
+00DF 53C0CF     760            anl     _SMB0CN0,#0xCF
+00E2            761   ;        MPU.c:170: SMB0DAT = (addr << 1) | 0x01;
+00E2 8AC2       762            mov     _SMB0DAT,r2
+00E4            763   ;        MPU.c:172: SMB0CN0 &= ~(0x01);
+00E4 53C0FE     764            anl     _SMB0CN0,#0xFE
+00E7            765   ;        MPU.c:174: if (SMB0CN0 & 0x02)
+00E7 E5C0       766            mov     a,_SMB0CN0
+00E9 30E1F0     767            jnb     acc.1,L007002?
+00EC            768   ;        MPU.c:176: printf("ACK recieved\n");
+00EC C002       769            push    ar2
+00EE 7430       770            mov     a,#__str_0
+00F0 C0E0       771            push    acc
+00F2 74C2       772            mov     a,#(__str_0 >> 8)
+00F4 C0E0       773            push    acc
+00F6 7480       774            mov     a,#0x80
+00F8 C0E0       775            push    acc
+00FA 120000     776            lcall   _printf
+00FD 1581       777            dec     sp
+00FF 1581       778            dec     sp
+0101 1581       779            dec     sp
+0103 D002       780            pop     ar2
+0105 8000       781            sjmp    L007004?
+0107            782   L007002?:
+0107            783   ;        MPU.c:181: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+0107 43C020     784            orl     _SMB0CN0,#0x20
+010A            785   ;        MPU.c:182: SMB0CN0 &= ~(0x01); // Clear SI
+010A 53C0FE     786            anl     _SMB0CN0,#0xFE
+010D 8000       787            sjmp    L007004?
+010F            788   L007006?:
+010F            789   ;        MPU.c:185: printf("Loop exited\n");
+010F 74F0       790            mov     a,#__str_1
+0111 C0E0       791            push    acc
+0113 74C2       792            mov     a,#(__str_1 >> 8)
+0115 C0E0       793            push    acc
+0117 7480       794            mov     a,#0x80
+0119 C0E0       795            push    acc
+011B 120000     796            lcall   _printf
+011E 1581       797            dec     sp
+0120 1581       798            dec     sp
+0122 1581       799            dec     sp
+0124            800   ;        MPU.c:187: while (!(SMB0CN0 & 0x02));
+0124            801   L007007?:
+0124 E5C0       802            mov     a,_SMB0CN0
+0126 30E130     803            jnb     acc.1,L007007?
+0129            804   ;        MPU.c:188: printf("Cleared interrupt flag\n");
+0129 7470       805            mov     a,#__str_2
+012B C0E0       806            push    acc
+012D 74C3       807            mov     a,#(__str_2 >> 8)
+012F C0E0       808            push    acc
+0131 7480       809            mov     a,#0x80
+0133 C0E0       810            push    acc
+0135 120000     811            lcall   _printf
+0138 1581       812            dec     sp
+013A 1581       813            dec     sp
+013C 1581       814            dec     sp
+013E            815   ;        MPU.c:193: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+013E            816   L007010?:
+013E E5C0       817            mov     a,_SMB0CN0
+0140 30E1B0     818            jnb     acc.1,L007010?
+0143            819   ;        MPU.c:196: SMB0DAT = data_input;
+0143 8570C2     820            mov     _SMB0DAT,_I2C_Write_PARM_2
+0146            821   ;        MPU.c:199: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+0146            822   L007013?:
+0146 E5C0       823            mov     a,_SMB0CN0
+0148 30E1F0     824            jnb     acc.1,L007013?
+014B            825   ;        MPU.c:202: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+014B 43C010     826            orl     _SMB0CN0,#0x10
+014E 22         827            ret
+014F            828   ;------------------------------------------------------------
+014F            829   ;Allocation info for local variables in function 'I2C_Read'
+014F            830   ;------------------------------------------------------------
+014F            831   ;addr                      Allocated to registers r2 
+014F            832   ;data_output               Allocated to registers 
+014F            833   ;------------------------------------------------------------
+014F            834   ;        MPU.c:205: uint8_t I2C_Read(uint8_t addr)
+014F            835   ;        -----------------------------------------
+014F            836   ;         function I2C_Read
+014F            837   ;        -----------------------------------------
+014F            838   _I2C_Read:
+014F AA82       839            mov     r2,dpl
+0151            840   ;        MPU.c:210: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+0151 43C020     841            orl     _SMB0CN0,#0x20
+0154            842   ;        MPU.c:212: while (SMB0CN0 & 0x20)
+0154 EA         843            mov     a,r2
+0155 2A         844            add     a,r2
+0156 FA         845            mov     r2,a
+0157 7401       846            mov     a,#0x01
+0159 4A         847            orl     a,r2
+015A FB         848            mov     r3,a
+015B            849   L008004?:
+015B E5C0       850            mov     a,_SMB0CN0
+015D 30E570     851            jnb     acc.5,L008006?
+0160            852   ;        MPU.c:215: SMB0CN0 &= ~(0x30);
+0160 53C0CF     853            anl     _SMB0CN0,#0xCF
+0163            854   ;        MPU.c:217: SMB0DAT = (addr << 1) | 0x01;
+0163 8BC2       855            mov     _SMB0DAT,r3
+0165            856   ;        MPU.c:219: SMB0CN0 &= ~(0x01);
+0165 53C0FE     857            anl     _SMB0CN0,#0xFE
+0168            858   ;        MPU.c:221: if (SMB0CN0 & 0x02)
+0168 E5C0       859            mov     a,_SMB0CN0
+016A 30E1B0     860            jnb     acc.1,L008002?
+016D            861   ;        MPU.c:223: printf("ACK recieved\n");
+016D C002       862            push    ar2
+016F C003       863            push    ar3
+0171 7430       864            mov     a,#__str_0
+0173 C0E0       865            push    acc
+0175 74C2       866            mov     a,#(__str_0 >> 8)
+0177 C0E0       867            push    acc
+0179 7480       868            mov     a,#0x80
+017B C0E0       869            push    acc
+017D 120000     870            lcall   _printf
+0180 1581       871            dec     sp
+0182 1581       872            dec     sp
+0184 1581       873            dec     sp
+0186 D003       874            pop     ar3
+0188 D002       875            pop     ar2
+018A 8000       876            sjmp    L008004?
+018C            877   L008002?:
+018C            878   ;        MPU.c:228: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+018C 43C020     879            orl     _SMB0CN0,#0x20
+018F            880   ;        MPU.c:229: SMB0CN0 &= ~(0x01); // Clear SI
+018F 53C0FE     881            anl     _SMB0CN0,#0xFE
+0192 8000       882            sjmp    L008004?
+0194            883   L008006?:
+0194            884   ;        MPU.c:232: printf("Loop exited\n");
+0194 C002       885            push    ar2
+0196 74F0       886            mov     a,#__str_1
+0198 C0E0       887            push    acc
+019A 74C2       888            mov     a,#(__str_1 >> 8)
+019C C0E0       889            push    acc
+019E 7480       890            mov     a,#0x80
+01A0 C0E0       891            push    acc
+01A2 120000     892            lcall   _printf
+01A5 1581       893            dec     sp
+01A7 1581       894            dec     sp
+01A9 1581       895            dec     sp
+01AB            896   ;        MPU.c:234: printf("Transfer started\n");
+01AB 74F0       897            mov     a,#__str_3
+01AD C0E0       898            push    acc
+01AF 74C4       899            mov     a,#(__str_3 >> 8)
+01B1 C0E0       900            push    acc
+01B3 7480       901            mov     a,#0x80
+01B5 C0E0       902            push    acc
+01B7 120000     903            lcall   _printf
+01BA 1581       904            dec     sp
+01BC 1581       905            dec     sp
+01BE 1581       906            dec     sp
+01C0            907   ;        MPU.c:235: printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+01C0 ABC0       908            mov     r3,_SMB0CN0
+01C2 7C00       909            mov     r4,#0x00
+01C4 C003       910            push    ar3
+01C6 C004       911            push    ar4
+01C8 7430       912            mov     a,#__str_4
+01CA C0E0       913            push    acc
+01CC 74C5       914            mov     a,#(__str_4 >> 8)
+01CE C0E0       915            push    acc
+01D0 7480       916            mov     a,#0x80
+01D2 C0E0       917            push    acc
+01D4 120000     918            lcall   _printf
+01D7 E581       919            mov     a,sp
+01D9 24FB       920            add     a,#0xfb
+01DB F581       921            mov     sp,a
+01DD D002       922            pop     ar2
+01DF            923   ;        MPU.c:237: while (!(SMB0CN0 & 0x02)); 
+01DF            924   L008007?:
+01DF E5C0       925            mov     a,_SMB0CN0
+01E1 30E170     926            jnb     acc.1,L008007?
+01E4            927   ;        MPU.c:239: printf("Transfer complete");
+01E4 C002       928            push    ar2
+01E6 74B0       929            mov     a,#__str_5
+01E8 C0E0       930            push    acc
+01EA 74C5       931            mov     a,#(__str_5 >> 8)
+01EC C0E0       932            push    acc
+01EE 7480       933            mov     a,#0x80
+01F0 C0E0       934            push    acc
+01F2 120000     935            lcall   _printf
+01F5 1581       936            dec     sp
+01F7 1581       937            dec     sp
+01F9 1581       938            dec     sp
+01FB D002       939            pop     ar2
+01FD            940   ;        MPU.c:242: SMB0DAT = (addr << 1) | 1;
+01FD 7401       941            mov     a,#0x01
+01FF 4A         942            orl     a,r2
+0200 F5C2       943            mov     _SMB0DAT,a
+0202            944   ;        MPU.c:245: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
+0202            945   L008010?:
+0202 E5C0       946            mov     a,_SMB0CN0
+0204 30E1F0     947            jnb     acc.1,L008010?
+0207            948   ;        MPU.c:248: data_output = SMB0DAT;
+0207 85C282     949            mov     dpl,_SMB0DAT
+020A            950   ;        MPU.c:251: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
+020A 43C010     951            orl     _SMB0CN0,#0x10
+020D            952   ;        MPU.c:253: return data_output;
+020D 22         953            ret
+020E            954   ;------------------------------------------------------------
+020E            955   ;Allocation info for local variables in function 'MPU6050_Init'
+020E            956   ;------------------------------------------------------------
+020E            957   ;------------------------------------------------------------
+020E            958   ;        MPU.c:256: void MPU6050_Init()
+020E            959   ;        -----------------------------------------
+020E            960   ;         function MPU6050_Init
+020E            961   ;        -----------------------------------------
+020E            962   _MPU6050_Init:
+020E            963   ;        MPU.c:258: I2C_Write(0x6B, 0x00);
+020E 757000     964            mov     _I2C_Write_PARM_2,#0x00
+0211 75826B     965            mov     dpl,#0x6B
+0214 020000     966            ljmp    _I2C_Write
+0217            967   ;------------------------------------------------------------
+0217            968   ;Allocation info for local variables in function 'Test_I2C'
+0217            969   ;------------------------------------------------------------
+0217            970   ;data_in                   Allocated to registers r2 
+0217            971   ;------------------------------------------------------------
+0217            972   ;        MPU.c:261: void Test_I2C()
+0217            973   ;        -----------------------------------------
+0217            974   ;         function Test_I2C
+0217            975   ;        -----------------------------------------
+0217            976   _Test_I2C:
+0217            977   ;        MPU.c:263: uint8_t data_in = I2C_Read(0x75);
+0217 758275     978            mov     dpl,#0x75
+021A 120000     979            lcall   _I2C_Read
+021D AA82       980            mov     r2,dpl
+021F            981   ;        MPU.c:264: printf("I2C: %u\n", data_in);
+021F 8A03       982            mov     ar3,r2
+0221 7C00       983            mov     r4,#0x00
+0223 C002       984            push    ar2
+0225 C003       985            push    ar3
+0227 C004       986            push    ar4
+0229 C003       987            push    ar3
+022B C004       988            push    ar4
+022D 7430       989            mov     a,#__str_6
+022F C0E0       990            push    acc
+0231 74C6       991            mov     a,#(__str_6 >> 8)
+0233 C0E0       992            push    acc
+0235 7480       993            mov     a,#0x80
+0237 C0E0       994            push    acc
+0239 120000     995            lcall   _printf
+023C E581       996            mov     a,sp
+023E 24FB       997            add     a,#0xfb
+0240 F581       998            mov     sp,a
+0242 D004       999            pop     ar4
+0244 D003      1000            pop     ar3
+0246 D002      1001            pop     ar2
+0248           1002   ;        MPU.c:266: if (data_in == 0x68)
+0248 BA6870    1003            cjne    r2,#0x68,L010002?
+024B           1004   ;        MPU.c:268: printf("I2C is working correctly\n");
+024B 74B0      1005            mov     a,#__str_7
+024D C0E0      1006            push    acc
+024F 74C6      1007            mov     a,#(__str_7 >> 8)
+0251 C0E0      1008            push    acc
+0253 7480      1009            mov     a,#0x80
+0255 C0E0      1010            push    acc
+0257 120000    1011            lcall   _printf
+025A 1581      1012            dec     sp
+025C 1581      1013            dec     sp
+025E 1581      1014            dec     sp
+0260 22        1015            ret
+0261           1016   L010002?:
+0261           1017   ;        MPU.c:273: printf("I2C is not working correctly: %u\n", data_in);
+0261 C003      1018            push    ar3
+0263 C004      1019            push    ar4
+0265 74F0      1020            mov     a,#__str_8
+0267 C0E0      1021            push    acc
+0269 74C6      1022            mov     a,#(__str_8 >> 8)
+026B C0E0      1023            push    acc
+026D 7480      1024            mov     a,#0x80
+026F C0E0      1025            push    acc
+0271 120000    1026            lcall   _printf
+0274 E581      1027            mov     a,sp
+0276 24FB      1028            add     a,#0xfb
+0278 F581      1029            mov     sp,a
+027A 22        1030            ret
+027B           1031   ;------------------------------------------------------------
+027B           1032   ;Allocation info for local variables in function 'main'
+027B           1033   ;------------------------------------------------------------
+027B           1034   ;------------------------------------------------------------
+027B           1035   ;        MPU.c:277: void main (void) 
+027B           1036   ;        -----------------------------------------
+027B           1037   ;         function main
+027B           1038   ;        -----------------------------------------
+027B           1039   _main:
+027B           1040   ;        MPU.c:282: waitms(500); // Give PuTTY a chance to start.
+027B 9001F4    1041            mov     dptr,#0x01F4
+027E 120000    1042            lcall   _waitms
+0281           1043   ;        MPU.c:283: printf("\x1b[2J \n"); // Clear screen using ANSI escape sequence.
+0281 7430      1044            mov     a,#__str_9
+0283 C0E0      1045            push    acc
+0285 74C7      1046            mov     a,#(__str_9 >> 8)
+0287 C0E0      1047            push    acc
+0289 7480      1048            mov     a,#0x80
+028B C0E0      1049            push    acc
+028D 120000    1050            lcall   _printf
+0290 1581      1051            dec     sp
+0292 1581      1052            dec     sp
+0294 1581      1053            dec     sp
+0296           1054   ;        MPU.c:288: __FILE__, __DATE__, __TIME__);
+0296           1055   ;        MPU.c:287: "Compiled: %s, %s\n\n",
+0296 7470      1056            mov     a,#__str_13
+0298 C0E0      1057            push    acc
+029A 74C7      1058            mov     a,#(__str_13 >> 8)
+029C C0E0      1059            push    acc
+029E 7480      1060            mov     a,#0x80
+02A0 C0E0      1061            push    acc
+02A2 74B0      1062            mov     a,#__str_12
+02A4 C0E0      1063            push    acc
+02A6 74C7      1064            mov     a,#(__str_12 >> 8)
+02A8 C0E0      1065            push    acc
+02AA 7480      1066            mov     a,#0x80
+02AC C0E0      1067            push    acc
+02AE 74F0      1068            mov     a,#__str_11
+02B0 C0E0      1069            push    acc
+02B2 74C7      1070            mov     a,#(__str_11 >> 8)
+02B4 C0E0      1071            push    acc
+02B6 7480      1072            mov     a,#0x80
+02B8 C0E0      1073            push    acc
+02BA 7430      1074            mov     a,#__str_10
+02BC C0E0      1075            push    acc
+02BE 74C8      1076            mov     a,#(__str_10 >> 8)
+02C0 C0E0      1077            push    acc
+02C2 7480      1078            mov     a,#0x80
+02C4 C0E0      1079            push    acc
+02C6 120000    1080            lcall   _printf
+02C9 E581      1081            mov     a,sp
+02CB 24F4      1082            add     a,#0xf4
+02CD F581      1083            mov     sp,a
+02CF           1084   ;        MPU.c:290: I2C_Init();
+02CF 120000    1085            lcall   _I2C_Init
+02D2           1086   ;        MPU.c:291: printf("Init Done\n");
+02D2 7470      1087            mov     a,#__str_14
+02D4 C0E0      1088            push    acc
+02D6 74C8      1089            mov     a,#(__str_14 >> 8)
+02D8 C0E0      1090            push    acc
+02DA 7480      1091            mov     a,#0x80
+02DC C0E0      1092            push    acc
+02DE 120000    1093            lcall   _printf
+02E1 1581      1094            dec     sp
+02E3 1581      1095            dec     sp
+02E5 1581      1096            dec     sp
+02E7           1097   ;        MPU.c:292: SMB0CN0 |= 0xE0; //Sets SMB0CN0.5 (STA) to start an I2C transfer
+02E7 43C0E0    1098            orl     _SMB0CN0,#0xE0
+02EA           1099   ;        MPU.c:293: printf("%02X\n", SMB0CN0);
+02EA AAC0      1100            mov     r2,_SMB0CN0
+02EC 7B00      1101            mov     r3,#0x00
+02EE C002      1102            push    ar2
+02F0 C003      1103            push    ar3
+02F2 74B0      1104            mov     a,#__str_15
+02F4 C0E0      1105            push    acc
+02F6 74C8      1106            mov     a,#(__str_15 >> 8)
+02F8 C0E0      1107            push    acc
+02FA 7480      1108            mov     a,#0x80
+02FC C0E0      1109            push    acc
+02FE 120000    1110            lcall   _printf
+0301 E581      1111            mov     a,sp
+0303 24FB      1112            add     a,#0xfb
+0305 F581      1113            mov     sp,a
+0307           1114   ;        MPU.c:295: printf("%02X\n", SMB0CN0);
+0307 AAC0      1115            mov     r2,_SMB0CN0
+0309 7B00      1116            mov     r3,#0x00
+030B C002      1117            push    ar2
+030D C003      1118            push    ar3
+030F 74B0      1119            mov     a,#__str_15
+0311 C0E0      1120            push    acc
+0313 74C8      1121            mov     a,#(__str_15 >> 8)
+0315 C0E0      1122            push    acc
+0317 7480      1123            mov     a,#0x80
+0319 C0E0      1124            push    acc
+031B 120000    1125            lcall   _printf
+031E E581      1126            mov     a,sp
+0320 24FB      1127            add     a,#0xfb
+0322 F581      1128            mov     sp,a
+0324           1129   ;        MPU.c:301: printf("Starting to read\n");
+0324 74F0      1130            mov     a,#__str_16
+0326 C0E0      1131            push    acc
+0328 74C8      1132            mov     a,#(__str_16 >> 8)
+032A C0E0      1133            push    acc
+032C 7480      1134            mov     a,#0x80
+032E C0E0      1135            push    acc
+0330 120000    1136            lcall   _printf
+0333 1581      1137            dec     sp
+0335 1581      1138            dec     sp
+0337 1581      1139            dec     sp
+0339           1140   ;        MPU.c:302: Test_I2C();
+0339 020000    1141            ljmp    _Test_I2C
+033C           1142            rseg R_CSEG
+033C           1143   
+0000           1144            rseg R_XINIT
+0000           1145   
+0000           1146            rseg R_CONST
+0000           1147   __str_0:
+0000 41434B20  1148            db 'ACK recieved'
      72656369
      65766564
-000C 0A        1077            db 0x0A
-000D 00        1078            db 0x00
-000E           1079   __str_1:
-000E 4C6F6F70  1080            db 'Loop exited'
+000C 0A        1149            db 0x0A
+000D 00        1150            db 0x00
+000E           1151   __str_1:
+000E 4C6F6F70  1152            db 'Loop exited'
      20657869
      746564
-0019 0A        1081            db 0x0A
-001A 00        1082            db 0x00
-001B           1083   __str_2:
-001B 436C6561  1084            db 'Cleared interrupt flag'
+0019 0A        1153            db 0x0A
+001A 00        1154            db 0x00
+001B           1155   __str_2:
+001B 436C6561  1156            db 'Cleared interrupt flag'
      72656420
      696E7465
      72727570
      7420666C
      6167
-0031 0A        1085            db 0x0A
-0032 00        1086            db 0x00
-0033           1087   __str_3:
-0033 5472616E  1088            db 'Transfer started'
+0031 0A        1157            db 0x0A
+0032 00        1158            db 0x00
+0033           1159   __str_3:
+0033 5472616E  1160            db 'Transfer started'
      73666572
      20737461
      72746564
-0043 00        1089            db 0x00
-0044           1090   __str_4:
-0044 534D4230  1091            db 'SMB0CN0: %02X'
+0043 0A        1161            db 0x0A
+0044 00        1162            db 0x00
+0045           1163   __str_4:
+0045 534D4230  1164            db 'SMB0CN0: %02X'
      434E303A
      20253032
      58
-0051 0A        1092            db 0x0A
-0052 00        1093            db 0x00
-0053           1094   __str_5:
-0053 5472616E  1095            db 'Transfer complete'
+0052 0A        1165            db 0x0A
+0053 00        1166            db 0x00
+0054           1167   __str_5:
+0054 5472616E  1168            db 'Transfer complete'
      73666572
      20636F6D
      706C6574
      65
-0064 00        1096            db 0x00
-0065           1097   __str_6:
-0065 49324320  1098            db 'I2C is working correctly'
+0065 00        1169            db 0x00
+0066           1170   __str_6:
+0066 4932433A  1171            db 'I2C: %u'
+     202575
+006D 0A        1172            db 0x0A
+006E 00        1173            db 0x00
+006F           1174   __str_7:
+006F 49324320  1175            db 'I2C is working correctly'
      69732077
      6F726B69
      6E672063
      6F727265
      63746C79
-007D 0A        1099            db 0x0A
-007E 00        1100            db 0x00
-007F           1101   __str_7:
-007F 49324320  1102            db 'I2C is not working correctly: %u'
+0087 0A        1176            db 0x0A
+0088 00        1177            db 0x00
+0089           1178   __str_8:
+0089 49324320  1179            db 'I2C is not working correctly: %u'
      6973206E
      6F742077
      6F726B69
@@ -1131,59 +1209,58 @@
      6F727265
      63746C79
      3A202575
-009F 0A        1103            db 0x0A
-00A0 00        1104            db 0x00
-00A1           1105   __str_8:
-00A1 1B        1106            db 0x1B
-00A2 5B324A20  1107            db '[2J '
-00A6 0A        1108            db 0x0A
-00A7 00        1109            db 0x00
-00A8           1110   __str_9:
-00A8 45464D38  1111            db 'EFM8 '
+00A9 0A        1180            db 0x0A
+00AA 00        1181            db 0x00
+00AB           1182   __str_9:
+00AB 1B        1183            db 0x1B
+00AC 5B324A20  1184            db '[2J '
+00B0 0A        1185            db 0x0A
+00B1 00        1186            db 0x00
+00B2           1187   __str_10:
+00B2 45464D38  1188            db 'EFM8 '
      20
-00AD 0A        1112            db 0x0A
-00AE 46696C65  1113            db 'File: %s'
+00B7 0A        1189            db 0x0A
+00B8 46696C65  1190            db 'File: %s'
      3A202573
-00B6 0A        1114            db 0x0A
-00B7 436F6D70  1115            db 'Compiled: %s, %s'
+00C0 0A        1191            db 0x0A
+00C1 436F6D70  1192            db 'Compiled: %s, %s'
      696C6564
      3A202573
      2C202573
-00C7 0A        1116            db 0x0A
-00C8 0A        1117            db 0x0A
-00C9 00        1118            db 0x00
-00CA           1119   __str_10:
-00CA 4D50552E  1120            db 'MPU.c'
+00D1 0A        1193            db 0x0A
+00D2 0A        1194            db 0x0A
+00D3 00        1195            db 0x00
+00D4           1196   __str_11:
+00D4 4D50552E  1197            db 'MPU.c'
      63
-00CF 00        1121            db 0x00
-00D0           1122   __str_11:
-00D0 41707220  1123            db 'Apr  1 2024'
-     20312032
+00D9 00        1198            db 0x00
+00DA           1199   __str_12:
+00DA 41707220  1200            db 'Apr  2 2024'
+     20322032
      303234
-00DB 00        1124            db 0x00
-00DC           1125   __str_12:
-00DC 31373A30  1126            db '17:08:19'
-     383A3139
-00E4 00        1127            db 0x00
-00E5           1128   __str_13:
-00E5 496E6974  1129            db 'Init Done'
+00E5 00        1201            db 0x00
+00E6           1202   __str_13:
+00E6 31333A31  1203            db '13:10:42'
+     303A3432
+00EE 00        1204            db 0x00
+00EF           1205   __str_14:
+00EF 496E6974  1206            db 'Init Done'
      20446F6E
      65
-00EE 0A        1130            db 0x0A
-00EF 00        1131            db 0x00
-00F0           1132   __str_14:
-00F0 25303258  1133            db '%02X'
-00F4 0A        1134            db 0x0A
-00F5 00        1135            db 0x00
-00F6           1136   __str_15:
-00F6 4D505536  1137            db 'MPU6050 Init Done'
-     30353020
-     496E6974
-     20446F6E
-     65
-0107 0A        1138            db 0x0A
-0108 00        1139            db 0x00
-0109           1140   
-0003           1141            CSEG
-0003           1142   
-0003           1143   end
+00F8 0A        1207            db 0x0A
+00F9 00        1208            db 0x00
+00FA           1209   __str_15:
+00FA 25303258  1210            db '%02X'
+00FE 0A        1211            db 0x0A
+00FF 00        1212            db 0x00
+0100           1213   __str_16:
+0100 53746172  1214            db 'Starting to read'
+     74696E67
+     20746F20
+     72656164
+0110 0A        1215            db 0x0A
+0111 00        1216            db 0x00
+0112           1217   
+0003           1218            CSEG
+0003           1219   
+0003           1220   end
