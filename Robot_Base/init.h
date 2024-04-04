@@ -1,0 +1,1 @@
+void Hardware_Init(void);

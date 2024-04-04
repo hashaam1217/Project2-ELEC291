@@ -155,6 +155,7 @@ void I2C_start (void)
 	SI = 0;
 	while (!SI); // Wait until start sent
 	STA = 0;     // Reset I2C start
+
 }
 
 void I2C_stop(void)
@@ -279,18 +280,36 @@ void nunchuck_getdata(unsigned char * s)
 
 void main (void)
 {
+	int i;
+	unsigned char buf[2];
 	unsigned char read_value;
 	unsigned char addr = 0x75 << 1;
+	//addr &= ~(0x01);
 	addr |= 0x01;
+	
 
+	printf("Hello\n");
+	printf("addr: %x\n", addr);
+	printf("Hello World\n");
+	
 	while (1)
 	{
+
+		printf("write SMB0CN0: %02X\n", SMBC0N0);
 		I2C_start();
 		I2C_write(0x75);
 		read_value = I2C_read();
+		
+		/*
+		for(i=0; i<2; i++)
+		{
+			buf[i]=I2C_read();
+		}*/
+		//ACK=0;			
 		I2C_stop();
 
 		printf("WHOAMI: %x\n", read_value);
+		printf("final SMB0CN0: %02X\n", SMBC0N0);
 	}
     
     /*

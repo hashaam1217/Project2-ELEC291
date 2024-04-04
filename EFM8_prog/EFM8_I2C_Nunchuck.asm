@@ -1,9 +1,9 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1170 (Feb 16 2022) (MSVC)
-; This file was generated Tue Apr 02 13:10:42 2024
+; This file was generated Tue Apr 02 15:27:27 2024
 ;--------------------------------------------------------
-$name MPU
+$name EFM8_I2C_Nunchuck
 $optc51 --model-small
 	R_DSEG    segment data
 	R_CSEG    segment code
@@ -24,17 +24,15 @@ $optc51 --model-small
 ; Public variables in this module
 ;--------------------------------------------------------
 	public _main
-	public _Test_I2C
-	public _MPU6050_Init
-	public _I2C_Read
-	public _I2C_Write
-	public _I2C_Init
-	public _TIMER0_Init
-	public _waitms
-	public _Timer3us
+	public _nunchuck_getdata
+	public _nunchuck_init
+	public _I2C_stop
+	public _I2C_start
+	public _I2C_read
+	public _I2C_write
+	public _Timer4ms
 	public __c51_external_startup
-	public _I2C_Write_PARM_2
-	public _overflow_count
+	public _nunchuck_init_PARM_1
 ;--------------------------------------------------------
 ; Special Function Registers
 ;--------------------------------------------------------
@@ -483,13 +481,21 @@ _TFRQ           BIT 0xdf
 ; internal ram data
 ;--------------------------------------------------------
 	rseg R_DSEG
-_overflow_count:
-	ds 1
-_I2C_Write_PARM_2:
-	ds 1
+_nunchuck_init_buf_1_37:
+	ds 6
+_nunchuck_init_sloc0_1_0:
+	ds 2
+_nunchuck_init_sloc1_1_0:
+	ds 2
+_nunchuck_init_sloc2_1_0:
+	ds 2
+_main_buf_1_44:
+	ds 2
 ;--------------------------------------------------------
 ; overlayable items in internal ram 
 ;--------------------------------------------------------
+	rseg	R_OSEG
+	rseg	R_OSEG
 	rseg	R_OSEG
 ;--------------------------------------------------------
 ; indirectly addressable internal ram data
@@ -503,6 +509,8 @@ _I2C_Write_PARM_2:
 ; bit data
 ;--------------------------------------------------------
 	rseg R_BSEG
+_nunchuck_init_PARM_1:
+	DBIT	1
 ;--------------------------------------------------------
 ; paged external ram data
 ;--------------------------------------------------------
@@ -546,227 +554,328 @@ _I2C_Write_PARM_2:
 ;Allocation info for local variables in function '_c51_external_startup'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	MPU.c:17: char _c51_external_startup (void)
+;	EFM8_I2C_Nunchuck.c:25: char _c51_external_startup (void)
 ;	-----------------------------------------
 ;	 function _c51_external_startup
 ;	-----------------------------------------
 __c51_external_startup:
 	using	0
-;	MPU.c:20: SFRPAGE = 0x00;
+;	EFM8_I2C_Nunchuck.c:28: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	MPU.c:21: WDTCN = 0xDE; //First key
+;	EFM8_I2C_Nunchuck.c:29: WDTCN = 0xDE; //First key
 	mov	_WDTCN,#0xDE
-;	MPU.c:22: WDTCN = 0xAD; //Second key
+;	EFM8_I2C_Nunchuck.c:30: WDTCN = 0xAD; //Second key
 	mov	_WDTCN,#0xAD
-;	MPU.c:24: VDM0CN |= 0x80;
-	orl	_VDM0CN,#0x80
-;	MPU.c:25: RSTSRC = 0x02;
-	mov	_RSTSRC,#0x02
-;	MPU.c:32: SFRPAGE = 0x10;
+;	EFM8_I2C_Nunchuck.c:32: VDM0CN=0x80;       // enable VDD monitor
+	mov	_VDM0CN,#0x80
+;	EFM8_I2C_Nunchuck.c:33: RSTSRC=0x02|0x04;  // Enable reset on missing clock detector and VDD
+	mov	_RSTSRC,#0x06
+;	EFM8_I2C_Nunchuck.c:40: SFRPAGE = 0x10;
 	mov	_SFRPAGE,#0x10
-;	MPU.c:33: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
+;	EFM8_I2C_Nunchuck.c:41: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
 	mov	_PFE0CN,#0x20
-;	MPU.c:34: SFRPAGE = 0x00;
+;	EFM8_I2C_Nunchuck.c:42: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	MPU.c:55: CLKSEL = 0x00;
+;	EFM8_I2C_Nunchuck.c:63: CLKSEL = 0x00;
 	mov	_CLKSEL,#0x00
-;	MPU.c:56: CLKSEL = 0x00;
+;	EFM8_I2C_Nunchuck.c:64: CLKSEL = 0x00;
 	mov	_CLKSEL,#0x00
-;	MPU.c:57: while ((CLKSEL & 0x80) == 0);
+;	EFM8_I2C_Nunchuck.c:65: while ((CLKSEL & 0x80) == 0);
 L002001?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002001?
-;	MPU.c:58: CLKSEL = 0x03;
+;	EFM8_I2C_Nunchuck.c:66: CLKSEL = 0x03;
 	mov	_CLKSEL,#0x03
-;	MPU.c:59: CLKSEL = 0x03;
+;	EFM8_I2C_Nunchuck.c:67: CLKSEL = 0x03;
 	mov	_CLKSEL,#0x03
-;	MPU.c:60: while ((CLKSEL & 0x80) == 0);
+;	EFM8_I2C_Nunchuck.c:68: while ((CLKSEL & 0x80) == 0);
 L002004?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002004?
-;	MPU.c:65: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
-	orl	_P0MDOUT,#0x10
-;	MPU.c:66: XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)                     
-	mov	_XBR0,#0x01
-;	MPU.c:67: XBR1     = 0X00;
-	mov	_XBR1,#0x00
-;	MPU.c:68: XBR2     = 0x40; // Enable crossbar and weak pull-ups
-	mov	_XBR2,#0x40
-;	MPU.c:74: SCON0 = 0x10;
+;	EFM8_I2C_Nunchuck.c:77: SCON0 = 0x10;
 	mov	_SCON0,#0x10
-;	MPU.c:75: CKCON0 |= 0b_0000_0000 ; // Timer 1 uses the system clock divided by 12.
-	mov	_CKCON0,_CKCON0
-;	MPU.c:76: TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
+;	EFM8_I2C_Nunchuck.c:78: TH1 = 0x100-((SYSCLK/BAUDRATE)/(12L*2L));
 	mov	_TH1,#0xE6
-;	MPU.c:77: TL1 = TH1;      // Init Timer1
+;	EFM8_I2C_Nunchuck.c:79: TL1 = TH1;      // Init Timer1
 	mov	_TL1,_TH1
-;	MPU.c:78: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
+;	EFM8_I2C_Nunchuck.c:80: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
 	anl	_TMOD,#0x0F
-;	MPU.c:79: TMOD |=  0x20;
+;	EFM8_I2C_Nunchuck.c:81: TMOD |=  0x20;
 	orl	_TMOD,#0x20
-;	MPU.c:80: TR1 = 1; // START Timer1
+;	EFM8_I2C_Nunchuck.c:82: TR1 = 1; // START Timer1
 	setb	_TR1
-;	MPU.c:81: TI = 1;  // Indicate TX0 ready
+;	EFM8_I2C_Nunchuck.c:83: TI = 1;  // Indicate TX0 ready
 	setb	_TI
-;	MPU.c:83: return 0;
+;	EFM8_I2C_Nunchuck.c:86: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
+	orl	_P0MDOUT,#0x10
+;	EFM8_I2C_Nunchuck.c:87: XBR0 = 0b_0000_0101; // Enable SMBus pins and UART pins P0.4(TX) and P0.5(RX)
+	mov	_XBR0,#0x05
+;	EFM8_I2C_Nunchuck.c:88: XBR1 = 0X00;
+	mov	_XBR1,#0x00
+;	EFM8_I2C_Nunchuck.c:89: XBR2 = 0x40; // Enable crossbar and weak pull-ups
+	mov	_XBR2,#0x40
+;	EFM8_I2C_Nunchuck.c:92: CKCON0 |= 0b_0000_0100; // Timer0 clock source = SYSCLK
+	orl	_CKCON0,#0x04
+;	EFM8_I2C_Nunchuck.c:93: TMOD &= 0xf0;  // Mask out timer 1 bits
+	anl	_TMOD,#0xF0
+;	EFM8_I2C_Nunchuck.c:94: TMOD |= 0x02;  // Timer0 in 8-bit auto-reload mode
+	orl	_TMOD,#0x02
+;	EFM8_I2C_Nunchuck.c:96: TL0 = TH0 = 256-(SYSCLK/SMB_FREQUENCY/3);
+	mov	_TH0,#0x10
+	mov	_TL0,#0x10
+;	EFM8_I2C_Nunchuck.c:97: TR0 = 1; // Enable timer 0
+	setb	_TR0
+;	EFM8_I2C_Nunchuck.c:100: SMB0CF = 0b_0101_1100; //INH | EXTHOLD | SMBTOE | SMBFTE ;
+	mov	_SMB0CF,#0x5C
+;	EFM8_I2C_Nunchuck.c:101: SMB0CF |= 0b_1000_0000;  // Enable SMBus
+	orl	_SMB0CF,#0x80
+;	EFM8_I2C_Nunchuck.c:103: return 0;
 	mov	dpl,#0x00
 	ret
 ;------------------------------------------------------------
-;Allocation info for local variables in function 'Timer3us'
+;Allocation info for local variables in function 'Timer4ms'
 ;------------------------------------------------------------
-;us                        Allocated to registers r2 
-;i                         Allocated to registers r3 
+;ms                        Allocated to registers r2 
+;i                         Allocated to registers r4 
+;k                         Allocated to registers r3 
 ;------------------------------------------------------------
-;	MPU.c:87: void Timer3us(unsigned char us)
+;	EFM8_I2C_Nunchuck.c:107: void Timer4ms(unsigned char ms)
 ;	-----------------------------------------
-;	 function Timer3us
+;	 function Timer4ms
 ;	-----------------------------------------
-_Timer3us:
+_Timer4ms:
 	mov	r2,dpl
-;	MPU.c:92: CKCON0|=0b_0100_0000;
-	orl	_CKCON0,#0x40
-;	MPU.c:94: TMR3RL = (-(SYSCLK)/1000000L); // Set Timer3 to overflow in 1us.
-	mov	_TMR3RL,#0xB8
-	mov	(_TMR3RL >> 8),#0xFF
-;	MPU.c:95: TMR3 = TMR3RL;                 // Initialize Timer3 for first overflow
-	mov	_TMR3,_TMR3RL
-	mov	(_TMR3 >> 8),(_TMR3RL >> 8)
-;	MPU.c:97: TMR3CN0 = 0x04;                 // Sart Timer3 and clear overflow flag
-	mov	_TMR3CN0,#0x04
-;	MPU.c:98: for (i = 0; i < us; i++)       // Count <us> overflows
-	mov	r3,#0x00
+;	EFM8_I2C_Nunchuck.c:112: k=SFRPAGE;
+	mov	r3,_SFRPAGE
+;	EFM8_I2C_Nunchuck.c:113: SFRPAGE=0x10;
+	mov	_SFRPAGE,#0x10
+;	EFM8_I2C_Nunchuck.c:115: CKCON1|=0b_0000_0001;
+	orl	_CKCON1,#0x01
+;	EFM8_I2C_Nunchuck.c:117: TMR4RL = 65536-(SYSCLK/1000L); // Set Timer4 to overflow in 1 ms.
+	mov	_TMR4RL,#0xC0
+	mov	(_TMR4RL >> 8),#0xE6
+;	EFM8_I2C_Nunchuck.c:118: TMR4 = TMR4RL;                 // Initialize Timer4 for first overflow
+	mov	_TMR4,_TMR4RL
+	mov	(_TMR4 >> 8),(_TMR4RL >> 8)
+;	EFM8_I2C_Nunchuck.c:120: TF4H=0; // Clear overflow flag
+	clr	_TF4H
+;	EFM8_I2C_Nunchuck.c:121: TR4=1;  // Start Timer4
+	setb	_TR4
+;	EFM8_I2C_Nunchuck.c:122: for (i = 0; i < ms; i++)       // Count <ms> overflows
+	mov	r4,#0x00
 L003004?:
 	clr	c
-	mov	a,r3
+	mov	a,r4
 	subb	a,r2
 	jnc	L003007?
-;	MPU.c:100: while (!(TMR3CN0 & 0x80));  // Wait for overflow
+;	EFM8_I2C_Nunchuck.c:124: while (!TF4H);  // Wait for overflow
 L003001?:
-	mov	a,_TMR3CN0
-	jnb	acc.7,L003001?
-;	MPU.c:101: TMR3CN0 &= ~(0x80);         // Clear overflow indicator
-	anl	_TMR3CN0,#0x7F
-;	MPU.c:98: for (i = 0; i < us; i++)       // Count <us> overflows
-	inc	r3
+;	EFM8_I2C_Nunchuck.c:125: TF4H=0;         // Clear overflow indicator
+	jbc	_TF4H,L003015?
+	sjmp	L003001?
+L003015?:
+;	EFM8_I2C_Nunchuck.c:122: for (i = 0; i < ms; i++)       // Count <ms> overflows
+	inc	r4
 	sjmp	L003004?
 L003007?:
-;	MPU.c:103: TMR3CN0 = 0 ;                   // Stop Timer3 and clear overflow flag
-	mov	_TMR3CN0,#0x00
+;	EFM8_I2C_Nunchuck.c:127: TR4=0; // Stop Timer4
+	clr	_TR4
+;	EFM8_I2C_Nunchuck.c:128: SFRPAGE=k;	
+	mov	_SFRPAGE,r3
 	ret
 ;------------------------------------------------------------
-;Allocation info for local variables in function 'waitms'
+;Allocation info for local variables in function 'I2C_write'
 ;------------------------------------------------------------
-;ms                        Allocated to registers r2 r3 
-;j                         Allocated to registers r2 r3 
+;output_data               Allocated to registers 
 ;------------------------------------------------------------
-;	MPU.c:106: void waitms (unsigned int ms)
+;	EFM8_I2C_Nunchuck.c:132: void I2C_write (unsigned char output_data)
 ;	-----------------------------------------
-;	 function waitms
+;	 function I2C_write
 ;	-----------------------------------------
-_waitms:
-	mov	r2,dpl
-	mov	r3,dph
-;	MPU.c:109: for(j=ms; j!=0; j--)
+_I2C_write:
+	mov	_SMB0DAT,dpl
+;	EFM8_I2C_Nunchuck.c:135: SI = 0;
+	clr	_SI
+;	EFM8_I2C_Nunchuck.c:136: while (!SI); // Wait until done with send
 L004001?:
-	cjne	r2,#0x00,L004010?
-	cjne	r3,#0x00,L004010?
+	jnb	_SI,L004001?
 	ret
-L004010?:
-;	MPU.c:111: Timer3us(249);
-	mov	dpl,#0xF9
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_read'
+;------------------------------------------------------------
+;input_data                Allocated to registers 
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:139: unsigned char I2C_read (void)
+;	-----------------------------------------
+;	 function I2C_read
+;	-----------------------------------------
+_I2C_read:
+;	EFM8_I2C_Nunchuck.c:143: SI = 0;
+	clr	_SI
+;	EFM8_I2C_Nunchuck.c:144: while (!SI); // Wait until we have data to read
+L005001?:
+	jnb	_SI,L005001?
+;	EFM8_I2C_Nunchuck.c:145: input_data = SMB0DAT; // Read the data
+	mov	dpl,_SMB0DAT
+;	EFM8_I2C_Nunchuck.c:147: return input_data;
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_start'
+;------------------------------------------------------------
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:150: void I2C_start (void)
+;	-----------------------------------------
+;	 function I2C_start
+;	-----------------------------------------
+_I2C_start:
+;	EFM8_I2C_Nunchuck.c:152: ACK = 1;
+	setb	_ACK
+;	EFM8_I2C_Nunchuck.c:153: STA = 1;     // Send I2C start
+	setb	_STA
+;	EFM8_I2C_Nunchuck.c:154: STO = 0;
+	clr	_STO
+;	EFM8_I2C_Nunchuck.c:155: SI = 0;
+	clr	_SI
+;	EFM8_I2C_Nunchuck.c:156: while (!SI); // Wait until start sent
+L006001?:
+	jnb	_SI,L006001?
+;	EFM8_I2C_Nunchuck.c:157: STA = 0;     // Reset I2C start
+	clr	_STA
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'I2C_stop'
+;------------------------------------------------------------
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:161: void I2C_stop(void)
+;	-----------------------------------------
+;	 function I2C_stop
+;	-----------------------------------------
+_I2C_stop:
+;	EFM8_I2C_Nunchuck.c:163: STO = 1;  	// Perform I2C stop
+	setb	_STO
+;	EFM8_I2C_Nunchuck.c:164: SI = 0;	// Clear SI
+	clr	_SI
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'nunchuck_init'
+;------------------------------------------------------------
+;i                         Allocated to registers r2 
+;buf                       Allocated with name '_nunchuck_init_buf_1_37'
+;sloc0                     Allocated with name '_nunchuck_init_sloc0_1_0'
+;sloc1                     Allocated with name '_nunchuck_init_sloc1_1_0'
+;sloc2                     Allocated with name '_nunchuck_init_sloc2_1_0'
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:168: void nunchuck_init(bit print_extension_type)
+;	-----------------------------------------
+;	 function nunchuck_init
+;	-----------------------------------------
+_nunchuck_init:
+;	EFM8_I2C_Nunchuck.c:173: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:174: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:175: I2C_write(0xF0);
+	mov	dpl,#0xF0
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:176: I2C_write(0x55);
+	mov	dpl,#0x55
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:177: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:178: Timer4ms(1);
+	mov	dpl,#0x01
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:180: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:181: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:182: I2C_write(0xFB);
+	mov	dpl,#0xFB
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:183: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:184: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:185: Timer4ms(1);
+	mov	dpl,#0x01
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:189: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:190: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:191: I2C_write(0xFA); // extension type register
+	mov	dpl,#0xFA
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:192: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:193: Timer4ms(3); // 3 ms required to complete acquisition
+	mov	dpl,#0x03
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:195: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:196: I2C_write(0xA5);
+	mov	dpl,#0xA5
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:199: for(i=0; i<6; i++)
+	mov	r2,#0x00
+L008003?:
+	cjne	r2,#0x06,L008013?
+L008013?:
+	jnc	L008006?
+;	EFM8_I2C_Nunchuck.c:201: buf[i]=I2C_read();
+	mov	a,r2
+	add	a,#_nunchuck_init_buf_1_37
+	mov	r0,a
+	push	ar2
+	push	ar0
+	lcall	_I2C_read
+	mov	a,dpl
+	pop	ar0
+	pop	ar2
+	mov	@r0,a
+;	EFM8_I2C_Nunchuck.c:199: for(i=0; i<6; i++)
+	inc	r2
+	sjmp	L008003?
+L008006?:
+;	EFM8_I2C_Nunchuck.c:203: ACK=0;
+	clr	_ACK
+;	EFM8_I2C_Nunchuck.c:204: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:205: Timer4ms(3);
+	mov	dpl,#0x03
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:207: if(print_extension_type)
+	jnb	_nunchuck_init_PARM_1,L008002?
+;	EFM8_I2C_Nunchuck.c:210: buf[0],  buf[1], buf[2], buf[3], buf[4], buf[5]);
+	mov	r2,(_nunchuck_init_buf_1_37 + 0x0005)
+	mov	r3,#0x00
+	mov	r4,(_nunchuck_init_buf_1_37 + 0x0004)
+	mov	r5,#0x00
+	mov	_nunchuck_init_sloc0_1_0,(_nunchuck_init_buf_1_37 + 0x0003)
+	mov	(_nunchuck_init_sloc0_1_0 + 1),#0x00
+	mov	_nunchuck_init_sloc1_1_0,(_nunchuck_init_buf_1_37 + 0x0002)
+	mov	(_nunchuck_init_sloc1_1_0 + 1),#0x00
+	mov	_nunchuck_init_sloc2_1_0,(_nunchuck_init_buf_1_37 + 0x0001)
+	mov	(_nunchuck_init_sloc2_1_0 + 1),#0x00
+	mov	r6,_nunchuck_init_buf_1_37
+	mov	r7,#0x00
+;	EFM8_I2C_Nunchuck.c:209: printf("Extension type: %02x  %02x  %02x  %02x  %02x  %02x\n", 
 	push	ar2
 	push	ar3
-	lcall	_Timer3us
-;	MPU.c:112: Timer3us(249);
-	mov	dpl,#0xF9
-	lcall	_Timer3us
-;	MPU.c:113: Timer3us(249);
-	mov	dpl,#0xF9
-	lcall	_Timer3us
-;	MPU.c:114: Timer3us(250);
-	mov	dpl,#0xFA
-	lcall	_Timer3us
-	pop	ar3
-	pop	ar2
-;	MPU.c:109: for(j=ms; j!=0; j--)
-	dec	r2
-	cjne	r2,#0xff,L004011?
-	dec	r3
-L004011?:
-	sjmp	L004001?
-;------------------------------------------------------------
-;Allocation info for local variables in function 'TIMER0_Init'
-;------------------------------------------------------------
-;------------------------------------------------------------
-;	MPU.c:118: void TIMER0_Init(void)
-;	-----------------------------------------
-;	 function TIMER0_Init
-;	-----------------------------------------
-_TIMER0_Init:
-;	MPU.c:120: TMOD&=0b_1111_0000; // Set the bits of Timer/Counter 0 to zero
-	anl	_TMOD,#0xF0
-;	MPU.c:121: TMOD|=0b_0000_0001; // Timer/Counter 0 used as a 16-bit timer
-	orl	_TMOD,#0x01
-;	MPU.c:122: TR0=0; // Stop Timer/Counter 0
-	clr	_TR0
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'I2C_Init'
-;------------------------------------------------------------
-;------------------------------------------------------------
-;	MPU.c:125: void I2C_Init()
-;	-----------------------------------------
-;	 function I2C_Init
-;	-----------------------------------------
-_I2C_Init:
-;	MPU.c:129: P2MDOUT |= 0x03; //Set P2.0 (SDA) and P2.1(SCL) as Push pull mode
-	orl	_P2MDOUT,#0x03
-;	MPU.c:133: XBR0 |= 0x04;
-	orl	_XBR0,#0x04
-;	MPU.c:136: SMB0CF 	= 0x00;
-	mov	_SMB0CF,#0x00
-;	MPU.c:137: SMB0CF |= 0xC0;
-	orl	_SMB0CF,#0xC0
-;	MPU.c:141: SMB0ADM |= 0x01;
-	orl	_SMB0ADM,#0x01
-;	MPU.c:143: IE |= 0x80; //Global Enable all interrupts
-	orl	_IE,#0x80
-;	MPU.c:144: EIE1 |= 0x01; //SMBus interrupts enable
-	orl	_EIE1,#0x01
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'I2C_Write'
-;------------------------------------------------------------
-;data_input                Allocated with name '_I2C_Write_PARM_2'
-;addr                      Allocated to registers r2 
-;------------------------------------------------------------
-;	MPU.c:148: void I2C_Write(uint8_t addr, uint8_t data_input)
-;	-----------------------------------------
-;	 function I2C_Write
-;	-----------------------------------------
-_I2C_Write:
-	mov	r2,dpl
-;	MPU.c:163: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-	orl	_SMB0CN0,#0x20
-;	MPU.c:165: while (SMB0CN0 & 0x20)
-	mov	a,r2
-	add	a,r2
-	mov	r2,a
-	orl	ar2,#0x01
-L007004?:
-	mov	a,_SMB0CN0
-	jnb	acc.5,L007006?
-;	MPU.c:168: SMB0CN0 &= ~(0x30);
-	anl	_SMB0CN0,#0xCF
-;	MPU.c:170: SMB0DAT = (addr << 1) | 0x01;
-	mov	_SMB0DAT,r2
-;	MPU.c:172: SMB0CN0 &= ~(0x01);
-	anl	_SMB0CN0,#0xFE
-;	MPU.c:174: if (SMB0CN0 & 0x02)
-	mov	a,_SMB0CN0
-	jnb	acc.1,L007002?
-;	MPU.c:176: printf("ACK recieved\n");
-	push	ar2
+	push	ar4
+	push	ar5
+	push	_nunchuck_init_sloc0_1_0
+	push	(_nunchuck_init_sloc0_1_0 + 1)
+	push	_nunchuck_init_sloc1_1_0
+	push	(_nunchuck_init_sloc1_1_0 + 1)
+	push	_nunchuck_init_sloc2_1_0
+	push	(_nunchuck_init_sloc2_1_0 + 1)
+	push	ar6
+	push	ar7
 	mov	a,#__str_0
 	push	acc
 	mov	a,#(__str_0 >> 8)
@@ -774,19 +883,210 @@ L007004?:
 	mov	a,#0x80
 	push	acc
 	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
+	mov	a,sp
+	add	a,#0xf1
+	mov	sp,a
+L008002?:
+;	EFM8_I2C_Nunchuck.c:215: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:216: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:217: I2C_write(0xF0);
+	mov	dpl,#0xF0
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:218: I2C_write(0xAA);
+	mov	dpl,#0xAA
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:219: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:220: Timer4ms(1);
+	mov	dpl,#0x01
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:222: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:223: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:224: I2C_write(0x40);
+	mov	dpl,#0x40
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:225: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:226: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:227: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:228: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:229: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:230: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:231: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:232: Timer4ms(1);
+	mov	dpl,#0x01
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:234: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:235: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:236: I2C_write(0x40);
+	mov	dpl,#0x40
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:237: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:238: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:239: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:240: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:241: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:242: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:243: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:244: Timer4ms(1);
+	mov	dpl,#0x01
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:246: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:247: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:248: I2C_write(0x40);
+	mov	dpl,#0x40
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:249: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:250: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:251: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:252: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:253: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:254: Timer4ms(1);
+	mov	dpl,#0x01
+	ljmp	_Timer4ms
+;------------------------------------------------------------
+;Allocation info for local variables in function 'nunchuck_getdata'
+;------------------------------------------------------------
+;s                         Allocated to registers r2 r3 r4 
+;i                         Allocated to registers r5 
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:257: void nunchuck_getdata(unsigned char * s)
+;	-----------------------------------------
+;	 function nunchuck_getdata
+;	-----------------------------------------
+_nunchuck_getdata:
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+;	EFM8_I2C_Nunchuck.c:262: I2C_start();
+	push	ar2
+	push	ar3
+	push	ar4
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:263: I2C_write(0xA4);
+	mov	dpl,#0xA4
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:264: I2C_write(0x00);
+	mov	dpl,#0x00
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:265: I2C_stop();
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:266: Timer4ms(3); 	// 3 ms required to complete acquisition
+	mov	dpl,#0x03
+	lcall	_Timer4ms
+;	EFM8_I2C_Nunchuck.c:269: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:270: I2C_write(0xA5);
+	mov	dpl,#0xA5
+	lcall	_I2C_write
+	pop	ar4
+	pop	ar3
 	pop	ar2
-	sjmp	L007004?
-L007002?:
-;	MPU.c:181: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-	orl	_SMB0CN0,#0x20
-;	MPU.c:182: SMB0CN0 &= ~(0x01); // Clear SI
-	anl	_SMB0CN0,#0xFE
-	sjmp	L007004?
-L007006?:
-;	MPU.c:185: printf("Loop exited\n");
+;	EFM8_I2C_Nunchuck.c:273: for(i=0; i<6; i++)
+	mov	r5,#0x00
+L009001?:
+	cjne	r5,#0x06,L009010?
+L009010?:
+	jnc	L009004?
+;	EFM8_I2C_Nunchuck.c:275: s[i]=(I2C_read()^0x17)+0x17; // Read and decrypt
+	mov	a,r5
+	add	a,r2
+	mov	r6,a
+	clr	a
+	addc	a,r3
+	mov	r7,a
+	mov	ar0,r4
+	push	ar2
+	push	ar3
+	push	ar4
+	push	ar5
+	push	ar6
+	push	ar7
+	push	ar0
+	lcall	_I2C_read
+	mov	a,dpl
+	pop	ar0
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	pop	ar4
+	pop	ar3
+	pop	ar2
+	xrl	a,#0x17
+	add	a,#0x17
+	mov	r1,a
+	mov	dpl,r6
+	mov	dph,r7
+	mov	b,r0
+	lcall	__gptrput
+;	EFM8_I2C_Nunchuck.c:273: for(i=0; i<6; i++)
+	inc	r5
+	sjmp	L009001?
+L009004?:
+;	EFM8_I2C_Nunchuck.c:277: ACK=0;
+	clr	_ACK
+;	EFM8_I2C_Nunchuck.c:278: I2C_stop();
+	ljmp	_I2C_stop
+;------------------------------------------------------------
+;Allocation info for local variables in function 'main'
+;------------------------------------------------------------
+;i                         Allocated with name '_main_i_1_44'
+;buf                       Allocated with name '_main_buf_1_44'
+;read_value                Allocated to registers r2 
+;addr                      Allocated to registers 
+;------------------------------------------------------------
+;	EFM8_I2C_Nunchuck.c:281: void main (void)
+;	-----------------------------------------
+;	 function main
+;	-----------------------------------------
+_main:
+;	EFM8_I2C_Nunchuck.c:291: printf("Hello\n");
 	mov	a,#__str_1
 	push	acc
 	mov	a,#(__str_1 >> 8)
@@ -797,11 +1097,11 @@ L007006?:
 	dec	sp
 	dec	sp
 	dec	sp
-;	MPU.c:187: while (!(SMB0CN0 & 0x02));
-L007007?:
-	mov	a,_SMB0CN0
-	jnb	acc.1,L007007?
-;	MPU.c:188: printf("Cleared interrupt flag\n");
+;	EFM8_I2C_Nunchuck.c:292: printf("addr: %x\n", addr);
+	mov	a,#0xEB
+	push	acc
+	clr	a
+	push	acc
 	mov	a,#__str_2
 	push	acc
 	mov	a,#(__str_2 >> 8)
@@ -809,91 +1109,10 @@ L007007?:
 	mov	a,#0x80
 	push	acc
 	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	MPU.c:193: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-L007010?:
-	mov	a,_SMB0CN0
-	jnb	acc.1,L007010?
-;	MPU.c:196: SMB0DAT = data_input;
-	mov	_SMB0DAT,_I2C_Write_PARM_2
-;	MPU.c:199: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-L007013?:
-	mov	a,_SMB0CN0
-	jnb	acc.1,L007013?
-;	MPU.c:202: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
-	orl	_SMB0CN0,#0x10
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'I2C_Read'
-;------------------------------------------------------------
-;addr                      Allocated to registers r2 
-;data_output               Allocated to registers 
-;------------------------------------------------------------
-;	MPU.c:205: uint8_t I2C_Read(uint8_t addr)
-;	-----------------------------------------
-;	 function I2C_Read
-;	-----------------------------------------
-_I2C_Read:
-	mov	r2,dpl
-;	MPU.c:210: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-	orl	_SMB0CN0,#0x20
-;	MPU.c:212: while (SMB0CN0 & 0x20)
-	mov	a,r2
-	add	a,r2
-	mov	r2,a
-	mov	a,#0x01
-	orl	a,r2
-	mov	r3,a
-L008004?:
-	mov	a,_SMB0CN0
-	jnb	acc.5,L008006?
-;	MPU.c:215: SMB0CN0 &= ~(0x30);
-	anl	_SMB0CN0,#0xCF
-;	MPU.c:217: SMB0DAT = (addr << 1) | 0x01;
-	mov	_SMB0DAT,r3
-;	MPU.c:219: SMB0CN0 &= ~(0x01);
-	anl	_SMB0CN0,#0xFE
-;	MPU.c:221: if (SMB0CN0 & 0x02)
-	mov	a,_SMB0CN0
-	jnb	acc.1,L008002?
-;	MPU.c:223: printf("ACK recieved\n");
-	push	ar2
-	push	ar3
-	mov	a,#__str_0
-	push	acc
-	mov	a,#(__str_0 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-	pop	ar3
-	pop	ar2
-	sjmp	L008004?
-L008002?:
-;	MPU.c:228: SMB0CN0 |= 0x20; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-	orl	_SMB0CN0,#0x20
-;	MPU.c:229: SMB0CN0 &= ~(0x01); // Clear SI
-	anl	_SMB0CN0,#0xFE
-	sjmp	L008004?
-L008006?:
-;	MPU.c:232: printf("Loop exited\n");
-	push	ar2
-	mov	a,#__str_1
-	push	acc
-	mov	a,#(__str_1 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	MPU.c:234: printf("Transfer started\n");
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
+;	EFM8_I2C_Nunchuck.c:293: printf("Hello World\n");
 	mov	a,#__str_3
 	push	acc
 	mov	a,#(__str_3 >> 8)
@@ -904,11 +1123,22 @@ L008006?:
 	dec	sp
 	dec	sp
 	dec	sp
-;	MPU.c:235: printf("SMB0CN0: %02X\n", SMB0CN0); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-	mov	r3,_SMB0CN0
-	mov	r4,#0x00
+;	EFM8_I2C_Nunchuck.c:295: while (1)
+L010002?:
+;	EFM8_I2C_Nunchuck.c:298: I2C_start();
+	lcall	_I2C_start
+;	EFM8_I2C_Nunchuck.c:299: I2C_write(0x75);
+	mov	dpl,#0x75
+	lcall	_I2C_write
+;	EFM8_I2C_Nunchuck.c:300: read_value = I2C_read();
+	lcall	_I2C_read
+	mov	r2,dpl
+;	EFM8_I2C_Nunchuck.c:308: I2C_stop();
+	push	ar2
+	lcall	_I2C_stop
+;	EFM8_I2C_Nunchuck.c:310: printf("WHOAMI: %x\n", read_value);
+	mov	r3,#0x00
 	push	ar3
-	push	ar4
 	mov	a,#__str_4
 	push	acc
 	mov	a,#(__str_4 >> 8)
@@ -919,299 +1149,30 @@ L008006?:
 	mov	a,sp
 	add	a,#0xfb
 	mov	sp,a
-	pop	ar2
-;	MPU.c:237: while (!(SMB0CN0 & 0x02)); 
-L008007?:
-	mov	a,_SMB0CN0
-	jnb	acc.1,L008007?
-;	MPU.c:239: printf("Transfer complete");
-	push	ar2
-	mov	a,#__str_5
-	push	acc
-	mov	a,#(__str_5 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-	pop	ar2
-;	MPU.c:242: SMB0DAT = (addr << 1) | 1;
-	mov	a,#0x01
-	orl	a,r2
-	mov	_SMB0DAT,a
-;	MPU.c:245: while (!(SMB0CN0 & 0x02)); //Waiting for SMB0CN0.0 (ACK) to indicate transfer complete
-L008010?:
-	mov	a,_SMB0CN0
-	jnb	acc.1,L008010?
-;	MPU.c:248: data_output = SMB0DAT;
-	mov	dpl,_SMB0DAT
-;	MPU.c:251: SMB0CN0 |= 0x10;  //Sets SMB0CN0.4 (STO) to stop an I2C transfer
-	orl	_SMB0CN0,#0x10
-;	MPU.c:253: return data_output;
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'MPU6050_Init'
-;------------------------------------------------------------
-;------------------------------------------------------------
-;	MPU.c:256: void MPU6050_Init()
-;	-----------------------------------------
-;	 function MPU6050_Init
-;	-----------------------------------------
-_MPU6050_Init:
-;	MPU.c:258: I2C_Write(0x6B, 0x00);
-	mov	_I2C_Write_PARM_2,#0x00
-	mov	dpl,#0x6B
-	ljmp	_I2C_Write
-;------------------------------------------------------------
-;Allocation info for local variables in function 'Test_I2C'
-;------------------------------------------------------------
-;data_in                   Allocated to registers r2 
-;------------------------------------------------------------
-;	MPU.c:261: void Test_I2C()
-;	-----------------------------------------
-;	 function Test_I2C
-;	-----------------------------------------
-_Test_I2C:
-;	MPU.c:263: uint8_t data_in = I2C_Read(0x75);
-	mov	dpl,#0x75
-	lcall	_I2C_Read
-	mov	r2,dpl
-;	MPU.c:264: printf("I2C: %u\n", data_in);
-	mov	ar3,r2
-	mov	r4,#0x00
-	push	ar2
-	push	ar3
-	push	ar4
-	push	ar3
-	push	ar4
-	mov	a,#__str_6
-	push	acc
-	mov	a,#(__str_6 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	mov	a,sp
-	add	a,#0xfb
-	mov	sp,a
-	pop	ar4
-	pop	ar3
-	pop	ar2
-;	MPU.c:266: if (data_in == 0x68)
-	cjne	r2,#0x68,L010002?
-;	MPU.c:268: printf("I2C is working correctly\n");
-	mov	a,#__str_7
-	push	acc
-	mov	a,#(__str_7 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-	ret
-L010002?:
-;	MPU.c:273: printf("I2C is not working correctly: %u\n", data_in);
-	push	ar3
-	push	ar4
-	mov	a,#__str_8
-	push	acc
-	mov	a,#(__str_8 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	mov	a,sp
-	add	a,#0xfb
-	mov	sp,a
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'main'
-;------------------------------------------------------------
-;------------------------------------------------------------
-;	MPU.c:277: void main (void) 
-;	-----------------------------------------
-;	 function main
-;	-----------------------------------------
-_main:
-;	MPU.c:282: waitms(500); // Give PuTTY a chance to start.
-	mov	dptr,#0x01F4
-	lcall	_waitms
-;	MPU.c:283: printf("\x1b[2J \n"); // Clear screen using ANSI escape sequence.
-	mov	a,#__str_9
-	push	acc
-	mov	a,#(__str_9 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	MPU.c:288: __FILE__, __DATE__, __TIME__);
-;	MPU.c:287: "Compiled: %s, %s\n\n",
-	mov	a,#__str_13
-	push	acc
-	mov	a,#(__str_13 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#__str_12
-	push	acc
-	mov	a,#(__str_12 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#__str_11
-	push	acc
-	mov	a,#(__str_11 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#__str_10
-	push	acc
-	mov	a,#(__str_10 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	mov	a,sp
-	add	a,#0xf4
-	mov	sp,a
-;	MPU.c:290: I2C_Init();
-	lcall	_I2C_Init
-;	MPU.c:291: printf("Init Done\n");
-	mov	a,#__str_14
-	push	acc
-	mov	a,#(__str_14 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	MPU.c:292: SMB0CN0 |= 0xE0; //Sets SMB0CN0.5 (STA) to start an I2C transfer
-	orl	_SMB0CN0,#0xE0
-;	MPU.c:293: printf("%02X\n", SMB0CN0);
-	mov	r2,_SMB0CN0
-	mov	r3,#0x00
-	push	ar2
-	push	ar3
-	mov	a,#__str_15
-	push	acc
-	mov	a,#(__str_15 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	mov	a,sp
-	add	a,#0xfb
-	mov	sp,a
-;	MPU.c:295: printf("%02X\n", SMB0CN0);
-	mov	r2,_SMB0CN0
-	mov	r3,#0x00
-	push	ar2
-	push	ar3
-	mov	a,#__str_15
-	push	acc
-	mov	a,#(__str_15 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	mov	a,sp
-	add	a,#0xfb
-	mov	sp,a
-;	MPU.c:301: printf("Starting to read\n");
-	mov	a,#__str_16
-	push	acc
-	mov	a,#(__str_16 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	MPU.c:302: Test_I2C();
-	ljmp	_Test_I2C
+	sjmp	L010002?
 	rseg R_CSEG
 
 	rseg R_XINIT
 
 	rseg R_CONST
 __str_0:
-	db 'ACK recieved'
+	db 'Extension type: %02x  %02x  %02x  %02x  %02x  %02x'
 	db 0x0A
 	db 0x00
 __str_1:
-	db 'Loop exited'
+	db 'Hello'
 	db 0x0A
 	db 0x00
 __str_2:
-	db 'Cleared interrupt flag'
+	db 'addr: %x'
 	db 0x0A
 	db 0x00
 __str_3:
-	db 'Transfer started'
+	db 'Hello World'
 	db 0x0A
 	db 0x00
 __str_4:
-	db 'SMB0CN0: %02X'
-	db 0x0A
-	db 0x00
-__str_5:
-	db 'Transfer complete'
-	db 0x00
-__str_6:
-	db 'I2C: %u'
-	db 0x0A
-	db 0x00
-__str_7:
-	db 'I2C is working correctly'
-	db 0x0A
-	db 0x00
-__str_8:
-	db 'I2C is not working correctly: %u'
-	db 0x0A
-	db 0x00
-__str_9:
-	db 0x1B
-	db '[2J '
-	db 0x0A
-	db 0x00
-__str_10:
-	db 'EFM8 '
-	db 0x0A
-	db 'File: %s'
-	db 0x0A
-	db 'Compiled: %s, %s'
-	db 0x0A
-	db 0x0A
-	db 0x00
-__str_11:
-	db 'MPU.c'
-	db 0x00
-__str_12:
-	db 'Apr  2 2024'
-	db 0x00
-__str_13:
-	db '13:10:42'
-	db 0x00
-__str_14:
-	db 'Init Done'
-	db 0x0A
-	db 0x00
-__str_15:
-	db '%02X'
-	db 0x0A
-	db 0x00
-__str_16:
-	db 'Starting to read'
+	db 'WHOAMI: %x'
 	db 0x0A
 	db 0x00
 
