@@ -1,0 +1,413 @@
+<MODULE>
+Speaker
+</MODULE>
+
+<OPTC51>
+--model-small
+</OPTC51>
+
+<SEGMENTS>
+R_GSINIT,code,0000,NO
+R_BSEG,bit,0000,NO
+R_XSEG,xdata,0008,NO
+BIT_BANK,data,0000,OV
+R_CONST,code,0000,NO
+rbank0,data,0000,OV
+R_PSEG,xdata,0000,NO
+R_DINIT,code,0000,NO
+R_DSEG,data,0000,NO
+R_OSEG,data,0000,OV
+R_IXSEG,xdata,0006,NO
+R_ISEG,idata,0000,NO
+R_HOME,code,0000,NO
+R_XINIT,code,0006,NO
+R_CSEG,code,01C6,NO
+</SEGMENTS>
+
+<LOCALS>
+L002006?,R_CSEG,0096,0000
+L002005?,R_CSEG,0085,0000
+L002004?,R_CSEG,0074,0000
+L002003?,R_CSEG,0063,0000
+L002002?,R_CSEG,0053,0000
+L002001?,R_CSEG,0043,0000
+L004009?,R_CSEG,01AD,0000
+L004007?,R_CSEG,016F,0000
+__xinit__TickCount,R_XINIT,0000,0000
+__xinit__RunCount,R_XINIT,0002,0000
+L002018?,R_CSEG,0025,0000
+L002017?,R_CSEG,001E,0000
+L002016?,R_CSEG,000B,0000
+L002011?,R_CSEG,00E3,0000
+L002010?,R_CSEG,00D8,0000
+L002009?,R_CSEG,00C7,0000
+L002008?,R_CSEG,00B8,0000
+L002007?,R_CSEG,00A7,0000
+</LOCALS>
+
+<PUBLICS>
+_Timer0_ISR,R_CSEG,00E9,0000
+_SpeakerStop,R_CSEG,00E6,0000
+_frequency,R_XSEG,0000,0004
+_RunCount,R_IXSEG,0002,0004
+_TickCount,R_IXSEG,0000,0002
+_per,R_XSEG,0004,0004
+_SpeakerStart,R_CSEG,0000,0000
+</PUBLICS>
+
+<EXTERNALS>
+</EXTERNALS>
+
+<CODE AT 0000>
+</CODE>
+
+<CODE R_HOME>
+</CODE>
+
+<CODE R_GSINIT>
+</CODE>
+
+<CODE R_CSEG>
+</CODE>
+
+<CODE AT 000B>
+02 addr16(_Timer0_ISR;)  
+</CODE>
+
+<CODE R_HOME>
+</CODE>
+
+<CODE R_GSINIT>
+</CODE>
+
+<CODE R_GSINIT>
+</CODE>
+
+<CODE R_DINIT>
+</CODE>
+
+<CODE R_CSEG>
+AA 82
+E5 83
+FB
+30 E7 rel3(L002016?;)
+02 addr16(L002010?;)  
+C3
+74 09
+9A
+E4
+64 80
+8B F0
+63 F0 80
+95 F0
+50 rel2(L002017?;)
+02 addr16(L002010?;)  
+EA
+2A
+2A
+90 data16(L002018?;)  
+73
+02 addr16(L002010?;)  
+02 addr16(L002001?;)  
+02 addr16(L002002?;)  
+02 addr16(L002003?;)  
+02 addr16(L002004?;)  
+02 addr16(L002005?;)  
+02 addr16(L002006?;)  
+02 addr16(L002007?;)  
+02 addr16(L002008?;)  
+02 addr16(L002009?;)  
+90 data16(_frequency;)  
+74 64
+F0
+E4
+A3
+F0
+A3
+F0
+A3
+F0
+02 addr16(L002011?;)  
+90 data16(_frequency;)  
+74 C8
+F0
+E4
+A3
+F0
+A3
+F0
+A3
+F0
+02 addr16(L002011?;)  
+90 data16(_frequency;)  
+74 2C
+F0
+A3
+74 01
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+74 F4
+F0
+A3
+74 01
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+74 EE
+F0
+A3
+74 02
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+74 E8
+F0
+A3
+74 03
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+74 DC
+F0
+A3
+74 05
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+74 B8
+F0
+A3
+74 0B
+F0
+A3
+E4
+F0
+A3
+F0
+90 data16(_frequency;)  
+74 10
+F0
+A3
+74 27
+F0
+A3
+E4
+F0
+A3
+F0
+80 rel2(L002011?;)
+90 data16(_frequency;)  
+E4
+F0
+A3
+F0
+A3
+F0
+A3
+F0
+D2 8C
+22
+C2 8C
+22
+C0 E0
+C0 82
+C0 83
+C0 02
+C0 03
+C0 04
+C0 05
+C0 06
+C0 07
+C0 00
+C0 01
+C0 D0
+75 D0 00
+75 A7 00
+75 8A AC
+75 8C B9
+90 data16(_RunCount;)  
+E0
+24 01
+F0
+A3
+E0
+34 00
+F0
+A3
+E0
+34 00
+F0
+A3
+E0
+34 00
+F0
+90 data16(_RunCount;)  
+E0
+FA
+A3
+E0
+FB
+A3
+E0
+FC
+A3
+E0
+FD
+90 data16(_frequency;)  
+E0
+FE
+A3
+E0
+FF
+A3
+E0
+F8
+A3
+E0
+F9
+C3
+EA
+9E
+EB
+9F
+EC
+98
+ED
+99
+50 rel2(L004007?;)
+90 data16(_TickCount;)  
+E0
+24 01
+F0
+A3
+E0
+34 00
+F0
+90 data16(_TickCount;)  
+E0
+FA
+A3
+E0
+FB
+BA 05 rel3(L004009?;)
+BB 00 rel3(L004009?;)
+90 data16(_TickCount;)  
+E4
+F0
+A3
+F0
+B2 A4
+80 rel2(L004009?;)
+90 data16(_frequency;)  
+E0
+FA
+A3
+E0
+FB
+A3
+E0
+FC
+A3
+E0
+FD
+EA
+2A
+FA
+EB
+33
+FB
+EC
+33
+FC
+ED
+33
+FD
+90 data16(_RunCount;)  
+E0
+FE
+A3
+E0
+FF
+A3
+E0
+F8
+A3
+E0
+F9
+C3
+EE
+9A
+EF
+9B
+E8
+9C
+E9
+9D
+40 rel2(L004009?;)
+90 data16(_RunCount;)  
+E4
+F0
+A3
+F0
+A3
+F0
+A3
+F0
+D0 D0
+D0 01
+D0 00
+D0 07
+D0 06
+D0 05
+D0 04
+D0 03
+D0 02
+D0 83
+D0 82
+D0 E0
+32
+</CODE>
+
+<CODE R_CSEG>
+</CODE>
+
+<CODE R_XINIT>
+00
+00
+00
+00
+00
+00
+</CODE>
+
+<CODE R_CONST>
+</CODE>
+
+<CODE AT 000E>
+</CODE>
